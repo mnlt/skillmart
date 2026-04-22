@@ -4,7 +4,7 @@ Ephemeral MCP migration for Claude Code. Move credentials to env vars, disable t
 
 ## What you save
 
-MCP tool definitions get loaded into every turn. In a multi-server setup, that routinely eats [49–60% of the 200k context window](https://github.com/anthropics/claude-code/issues/13717) before you type anything.
+MCP tool definitions get loaded into every turn. In a multi-server setup, that's tens of thousands of tokens paid upfront — every turn, for schemas the agent may not use. Bigger context windows raise the ceiling, but they don't change the per-turn cost, cache invalidation, or the "process everything the tool returns" problem.
 
 Measured via Anthropic's `count_tokens` endpoint (real Claude tokenizer), 2026-04-22:
 
