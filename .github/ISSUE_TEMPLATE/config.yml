@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Propose your own MCP (contributor path)
+    url: https://github.com/mnlt/teleport/blob/main/CONTRIBUTING.md
+    about: If you built an MCP and want it in the catalog with your own SKILL.md, read the submission policy first.
+  - name: Reddit thread
+    url: https://www.reddit.com/r/ClaudeAI
+    about: For open discussion or feedback, the launch thread on r/ClaudeAI is probably still active.

@@ -102,9 +102,9 @@ See [catalog.json](./catalog.json) — 30 entries (20 MCP-wrappers + 10 self-con
 
 Teleport only catalogs MCPs already listed on a trusted registry that runs automated security checks ([Anthropic MCP Registry](https://registry.modelcontextprotocol.io/), [Smithery](https://smithery.ai), [Glama](https://glama.ai/mcp/servers), or similar). We delegate security auditing to those registries — we don't re-audit.
 
-To propose an MCP: **open an issue** (not a PR) with the registry link + a draft SKILL.md using [`skills/_template/SKILL.md`](skills/_template/SKILL.md). The maintainer adds accepted entries manually.
+**Want teleport to support an MCP you use?** Open a ["Request an MCP" issue](../../issues/new?template=request-mcp.yml), or thumbs-up the service on the pinned MCP Request Board. This is the path if you're a user, not the MCP author.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the submission policy, field-by-field documentation, and what we reject.
+**Built an MCP and want it in the catalog?** See [CONTRIBUTING.md](CONTRIBUTING.md) — requires a draft SKILL.md and a registry link.
 
 ## Design notes
 
