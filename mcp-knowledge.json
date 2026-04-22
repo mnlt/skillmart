@@ -1,0 +1,604 @@
+{
+  "version": "0.1.0",
+  "updated_at": "2026-04-21",
+  "_notes": "Knowledge base for MCP-wrapper skills. Each entry documents the canonical env var, REST endpoint, and auth scheme so the setup skill can migrate credentials and the meta-skill can bypass MCP to HTTP. All 'verified: true' fields confirmed via npm registry, official docs, and context7 on 2026-04-21.",
+  "mcps": {
+    "context7": {
+      "category": "A",
+      "name": "Context7",
+      "description": "Up-to-date library documentation",
+      "npm_package": "@upstash/context7-mcp",
+      "npm_version": "2.1.8",
+      "hosted_mcp_url": "https://mcp.context7.com/mcp",
+      "mcp_server_default_name": "context7",
+      "env_var": "CONTEXT7_API_KEY",
+      "rest_endpoint": "https://context7.com/api/v1",
+      "auth": {
+        "type": "bearer",
+        "header": "Authorization",
+        "format": "Bearer {token}"
+      },
+      "docs": "https://context7.com/docs/api-guide",
+      "key_format": "ctx7sk-*",
+      "verified": true,
+      "baseline_tokens": 1500,
+      "signup_url": "https://context7.com/dashboard",
+      "key_format_regex": "^ctx7sk-[0-9a-f-]+$",
+      "key_example": "ctx7sk-...",
+      "friction": "low",
+      "friction_note": "free tier, ~1 min"
+    },
+    "github": {
+      "category": "A",
+      "name": "GitHub",
+      "description": "Repo ops, PRs, issues, code search",
+      "npm_package": "@modelcontextprotocol/server-github",
+      "npm_version": "2025.4.8",
+      "mcp_server_default_name": "github",
+      "env_var": "GITHUB_TOKEN",
+      "alt_env_vars": [
+        "GITHUB_PERSONAL_ACCESS_TOKEN"
+      ],
+      "rest_endpoint": "https://api.github.com",
+      "auth": {
+        "type": "bearer",
+        "header": "Authorization",
+        "format": "Bearer {token}"
+      },
+      "extra_headers": {
+        "Accept": "application/vnd.github+json"
+      },
+      "docs": "https://docs.github.com/en/rest",
+      "key_format": "ghp_* or github_pat_*",
+      "verified": true,
+      "baseline_tokens": 8000,
+      "signup_url": "https://github.com/settings/tokens",
+      "key_format_regex": "^(ghp_|github_pat_)[A-Za-z0-9_]+$",
+      "key_example": "ghp_* or github_pat_*",
+      "friction": "low",
+      "friction_note": "free, ~1 min; pick 'Fine-grained tokens' \u2192 select repos + scopes",
+      "baseline_tokens_measured": 5385,
+      "baseline_tokens_measured_date": "2026-04-22",
+      "baseline_tokens_measured_tools": 26
+    },
+    "slack": {
+      "category": "A",
+      "name": "Slack",
+      "description": "Channels, messages, threads, search",
+      "npm_package": "@modelcontextprotocol/server-slack",
+      "npm_version": "2025.4.25",
+      "mcp_server_default_name": "slack",
+      "env_var": "SLACK_BOT_TOKEN",
+      "alt_env_vars": [
+        "SLACK_USER_TOKEN"
+      ],
+      "rest_endpoint": "https://slack.com/api",
+      "auth": {
+        "type": "bearer",
+        "header": "Authorization",
+        "format": "Bearer {token}"
+      },
+      "docs": "https://api.slack.com/web",
+      "key_format": "xoxb-* (bot) or xoxp-* (user)",
+      "verified": true,
+      "baseline_tokens": 4500,
+      "signup_url": "https://api.slack.com/apps",
+      "key_format_regex": "^xox[bpu]-[0-9A-Za-z-]+$",
+      "key_example": "xoxb-* (bot) or xoxp-* (user)",
+      "friction": "medium",
+      "friction_note": "requires creating a Slack app with scopes; ~5 min",
+      "baseline_tokens_measured": 1411,
+      "baseline_tokens_measured_date": "2026-04-22",
+      "baseline_tokens_measured_tools": 8
+    },
+    "notion": {
+      "category": "A",
+      "name": "Notion",
+      "description": "Pages, databases, tasks",
+      "npm_package": "@notionhq/notion-mcp-server",
+      "npm_version": "2.2.1",
+      "hosted_mcp_url": "https://mcp.notion.com/mcp",
+      "mcp_server_default_name": "notion",
+      "env_var": "NOTION_API_KEY",
+      "alt_env_vars": [
+        "NOTION_TOKEN",
+        "NOTION_INTEGRATION_TOKEN"
+      ],
+      "rest_endpoint": "https://api.notion.com/v1",
+      "auth": {
+        "type": "bearer",
+        "header": "Authorization",
+        "format": "Bearer {token}",
+        "extra_headers": {
+          "Notion-Version": "2026-03-11"
+        }
+      },
+      "docs": "https://developers.notion.com/reference/intro",
+      "key_format": "secret_* or ntn_*",
+      "verified": true,
+      "_note": "Notion-Version updated to 2026-03-11 per current Notion SDK (was 2022-06-28 in older docs)",
+      "baseline_tokens": 6000,
+      "signup_url": "https://www.notion.com/my-integrations",
+      "key_format_regex": "^(secret_|ntn_)[A-Za-z0-9]+$",
+      "key_example": "secret_* or ntn_*",
+      "friction": "low",
+      "friction_note": "create integration + share target pages with it; ~2 min",
+      "baseline_tokens_measured": 22056,
+      "baseline_tokens_measured_date": "2026-04-22",
+      "baseline_tokens_measured_tools": 22
+    },
+    "linear": {
+      "category": "A",
+      "name": "Linear",
+      "description": "Issues, projects, cycles",
+      "npm_package": null,
+      "npm_community_packages": [
+        "@mseep/linear-mcp",
+        "@hatcloud/linear-mcp"
+      ],
+      "hosted_mcp_url": "https://mcp.linear.app/mcp",
+      "mcp_server_default_name": "linear",
+      "env_var": "LINEAR_API_KEY",
+      "rest_endpoint": "https://api.linear.app/graphql",
+      "api_style": "graphql",
+      "auth": {
+        "type": "raw-token",
+        "header": "Authorization",
+        "format": "{token}",
+        "note": "Personal API keys (lin_api_*) passed directly without 'Bearer ' prefix. OAuth tokens (lin_oauth_*) use 'Bearer ' prefix."
+      },
+      "docs": "https://linear.app/developers/graphql",
+      "key_format": "lin_api_* (personal) or lin_oauth_* (OAuth)",
+      "verified": true,
+      "_note": "No first-party npm package; hosted MCP is the official vendor path.",
+      "baseline_tokens": 3500,
+      "signup_url": "https://linear.app/settings/account/security",
+      "key_format_regex": "^lin_api_[A-Za-z0-9]+$",
+      "key_example": "lin_api_*",
+      "friction": "low",
+      "friction_note": "workspace member; ~1 min",
+      "baseline_tokens_measured": 5920,
+      "baseline_tokens_measured_date": "2026-04-22",
+      "baseline_tokens_measured_tools": 42
+    },
+    "figma": {
+      "category": "A",
+      "name": "Figma",
+      "description": "Files, components, assets, export",
+      "npm_package": "figma-developer-mcp",
+      "npm_version": "0.11.0",
+      "mcp_server_default_name": "figma",
+      "env_var": "FIGMA_ACCESS_TOKEN",
+      "alt_env_vars": [
+        "FIGMA_API_KEY",
+        "FIGMA_TOKEN"
+      ],
+      "rest_endpoint": "https://api.figma.com/v1",
+      "auth": {
+        "type": "custom-header",
+        "header": "X-Figma-Token",
+        "format": "{token}",
+        "note": "Figma uses X-Figma-Token, NOT Authorization header"
+      },
+      "docs": "https://www.figma.com/developers/api",
+      "key_format": "figd_* or fd_*",
+      "verified": true,
+      "_note": "figma-developer-mcp is community, not first-party Figma.",
+      "baseline_tokens": 2500,
+      "signup_url": "https://www.figma.com/settings",
+      "key_format_regex": "^(figd_|fd_)[A-Za-z0-9_-]+$",
+      "key_example": "figd_* or fd_*",
+      "friction": "low",
+      "friction_note": "any Figma account; ~1 min",
+      "baseline_tokens_measured": 1591,
+      "baseline_tokens_measured_date": "2026-04-22",
+      "baseline_tokens_measured_tools": 2
+    },
+    "jira": {
+      "category": "A",
+      "name": "Jira",
+      "description": "Issues, boards, projects (Atlassian Cloud)",
+      "npm_package": null,
+      "npm_community_packages": [
+        "jira-mcp",
+        "@jourlez/atlassian-mcp-server",
+        "@xuandev/atlassian-mcp"
+      ],
+      "hosted_mcp_url": "https://mcp.atlassian.com/v1/sse",
+      "mcp_server_default_name": "jira",
+      "env_var": "JIRA_API_TOKEN",
+      "extra_env_vars": [
+        "JIRA_EMAIL",
+        "JIRA_BASE_URL"
+      ],
+      "rest_endpoint": "{JIRA_BASE_URL}/rest/api/3",
+      "auth": {
+        "type": "basic",
+        "header": "Authorization",
+        "format": "Basic base64({JIRA_EMAIL}:{JIRA_API_TOKEN})",
+        "note": "Jira Cloud REST uses Basic auth with email:token combo, base64-encoded. Hosted MCP (Rovo) uses OAuth separately."
+      },
+      "docs": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/intro/",
+      "key_format": "opaque string from id.atlassian.com",
+      "verified": true,
+      "_note": "Atlassian Rovo (hosted MCP) is official. No first-party npm package \u2014 community only.",
+      "baseline_tokens": 5000,
+      "signup_url": "https://id.atlassian.com/manage-profile/security/api-tokens",
+      "key_format_regex": "^[A-Za-z0-9]+$",
+      "key_example": "opaque token",
+      "friction": "medium",
+      "friction_note": "requires email + base URL + API token (3 inputs)",
+      "multi_var": true
+    },
+    "exa": {
+      "category": "A",
+      "name": "Exa",
+      "description": "AI-first web search",
+      "npm_package": "exa-mcp-server",
+      "npm_version": "3.2.0",
+      "mcp_server_default_name": "exa",
+      "env_var": "EXA_API_KEY",
+      "rest_endpoint": "https://api.exa.ai",
+      "auth": {
+        "type": "custom-header",
+        "header": "x-api-key",
+        "format": "{token}",
+        "alt": {
+          "type": "bearer",
+          "header": "Authorization",
+          "format": "Bearer {token}",
+          "note": "Some Exa endpoints also accept Bearer \u2014 prefer x-api-key per SDK convention"
+        }
+      },
+      "docs": "https://docs.exa.ai/reference/getting-started",
+      "key_format": "opaque uuid-like",
+      "verified": true,
+      "_note": "Exa SDK auto-reads EXA_API_KEY env var. Raw HTTP header is x-api-key per docs.",
+      "baseline_tokens": 1500,
+      "signup_url": "https://dashboard.exa.ai",
+      "key_format_regex": "^[a-f0-9-]{8,}$",
+      "key_example": "uuid-like",
+      "friction": "low",
+      "friction_note": "free tier, ~1 min signup"
+    },
+    "stripe": {
+      "category": "A",
+      "name": "Stripe",
+      "description": "Payments, customers, subscriptions",
+      "npm_package": "@stripe/mcp",
+      "npm_version": "0.3.3",
+      "hosted_mcp_url": "https://mcp.stripe.com",
+      "mcp_server_default_name": "stripe",
+      "env_var": "STRIPE_API_KEY",
+      "alt_env_vars": [
+        "STRIPE_SECRET_KEY"
+      ],
+      "rest_endpoint": "https://api.stripe.com/v1",
+      "auth": {
+        "type": "bearer",
+        "header": "Authorization",
+        "format": "Bearer {token}"
+      },
+      "docs": "https://docs.stripe.com/api",
+      "key_format": "sk_live_* or sk_test_*",
+      "verified": true,
+      "baseline_tokens": 7000,
+      "signup_url": "https://dashboard.stripe.com/apikeys",
+      "key_format_regex": "^sk_(live|test)_[A-Za-z0-9]+$",
+      "key_example": "sk_live_* or sk_test_*",
+      "friction": "low",
+      "friction_note": "test keys are free & instant; live keys require KYC"
+    },
+    "supabase": {
+      "category": "A",
+      "name": "Supabase",
+      "description": "Projects, database, auth, storage (Management API + Project REST)",
+      "npm_package": "@supabase/mcp-server-supabase",
+      "npm_version": "0.7.0",
+      "mcp_server_default_name": "supabase",
+      "env_var": "SUPABASE_ACCESS_TOKEN",
+      "extra_env_vars_per_project": [
+        "SUPABASE_URL",
+        "SUPABASE_ANON_KEY",
+        "SUPABASE_SERVICE_ROLE_KEY"
+      ],
+      "rest_endpoint": "https://api.supabase.com/v1",
+      "project_rest_endpoint": "{SUPABASE_URL}/rest/v1",
+      "auth": {
+        "management": {
+          "type": "bearer",
+          "header": "Authorization",
+          "format": "Bearer {SUPABASE_ACCESS_TOKEN}"
+        },
+        "project_rest": {
+          "type": "bearer-and-apikey",
+          "headers": {
+            "Authorization": "Bearer {SUPABASE_ANON_KEY or SERVICE_ROLE_KEY}",
+            "apikey": "{SUPABASE_ANON_KEY or SERVICE_ROLE_KEY}"
+          },
+          "note": "Supabase project REST requires BOTH Authorization Bearer AND apikey header with the same value"
+        }
+      },
+      "docs": "https://supabase.com/docs/reference/api/introduction",
+      "key_format": "sbp_* (management PAT), eyJ* (anon/service JWT)",
+      "verified": true,
+      "_note": "Supabase has two auth surfaces: account Management API (sbp_*) and per-project REST (anon/service keys). Setup skill needs to ask which the user wants to migrate.",
+      "baseline_tokens": 5500,
+      "signup_url": "https://supabase.com/dashboard/account/tokens",
+      "key_format_regex": "^sbp_[a-f0-9]+$",
+      "key_example": "sbp_* (management PAT)",
+      "friction": "low",
+      "friction_note": "free; for management API. Project-level anon/service keys are separate (dashboard \u2192 project settings)"
+    },
+    "vercel": {
+      "category": "A",
+      "name": "Vercel",
+      "description": "Deployments, projects, logs, env vars, domains, DNS",
+      "npm_package": null,
+      "npm_community_packages": [
+        "@vercel/mcp"
+      ],
+      "hosted_mcp_url": "https://mcp.vercel.com",
+      "mcp_server_default_name": "vercel",
+      "env_var": "VERCEL_TOKEN",
+      "rest_endpoint": "https://api.vercel.com",
+      "auth": {
+        "type": "bearer",
+        "header": "Authorization",
+        "format": "Bearer {token}"
+      },
+      "docs": "https://vercel.com/docs/rest-api",
+      "key_format": "opaque (32+ chars)",
+      "signup_url": "https://vercel.com/account/tokens",
+      "key_format_regex": "^[A-Za-z0-9_-]{20,}$",
+      "key_example": "opaque 32+ char token",
+      "friction": "low",
+      "friction_note": "free tier; ~1 min \u2014 create scoped token",
+      "baseline_tokens": 5000,
+      "verified": true
+    },
+    "netlify": {
+      "category": "A",
+      "name": "Netlify",
+      "description": "Sites, deploys, functions, env vars, forms, domains",
+      "npm_package": null,
+      "hosted_mcp_url": null,
+      "mcp_server_default_name": "netlify",
+      "env_var": "NETLIFY_AUTH_TOKEN",
+      "alt_env_vars": [
+        "NETLIFY_PERSONAL_TOKEN"
+      ],
+      "rest_endpoint": "https://api.netlify.com/api/v1",
+      "auth": {
+        "type": "bearer",
+        "header": "Authorization",
+        "format": "Bearer {token}"
+      },
+      "docs": "https://docs.netlify.com/api/get-started/",
+      "key_format": "opaque",
+      "signup_url": "https://app.netlify.com/user/applications#personal-access-tokens",
+      "key_format_regex": "^[A-Za-z0-9_.-]{30,}$",
+      "key_example": "opaque 40+ char token",
+      "friction": "low",
+      "friction_note": "free tier; ~1 min",
+      "baseline_tokens": 4000,
+      "verified": true
+    },
+    "cloudflare": {
+      "category": "A",
+      "name": "Cloudflare",
+      "description": "DNS zones, Workers, Pages, R2, KV, D1, Durable Objects, Analytics",
+      "npm_package": null,
+      "hosted_mcp_url": "https://observability.mcp.cloudflare.com",
+      "mcp_server_default_name": "cloudflare",
+      "env_var": "CLOUDFLARE_API_TOKEN",
+      "rest_endpoint": "https://api.cloudflare.com/client/v4",
+      "auth": {
+        "type": "bearer",
+        "header": "Authorization",
+        "format": "Bearer {token}"
+      },
+      "docs": "https://developers.cloudflare.com/api/",
+      "key_format": "opaque",
+      "signup_url": "https://dash.cloudflare.com/profile/api-tokens",
+      "key_format_regex": "^[A-Za-z0-9_-]{40,}$",
+      "key_example": "opaque 40-char token (use 'Create Token' with scoped permissions, not Global API Key)",
+      "friction": "low",
+      "friction_note": "free tier; pick scopes for only what you need; ~2 min",
+      "baseline_tokens": 8000,
+      "verified": true
+    },
+    "railway": {
+      "category": "A",
+      "name": "Railway",
+      "description": "Projects, services, deployments, environments, logs, env vars",
+      "npm_package": null,
+      "hosted_mcp_url": null,
+      "mcp_server_default_name": "railway",
+      "env_var": "RAILWAY_TOKEN",
+      "rest_endpoint": "https://backboard.railway.app/graphql/v2",
+      "api_style": "graphql",
+      "auth": {
+        "type": "bearer",
+        "header": "Authorization",
+        "format": "Bearer {token}"
+      },
+      "docs": "https://docs.railway.com/reference/public-api",
+      "key_format": "opaque",
+      "signup_url": "https://railway.com/account/tokens",
+      "key_format_regex": "^[A-Za-z0-9_.-]{20,}$",
+      "key_example": "opaque UUID-like token",
+      "friction": "low",
+      "friction_note": "free tier trial ~$5 credit; ~1 min for token",
+      "baseline_tokens": 4500,
+      "verified": true
+    },
+    "resend": {
+      "category": "A",
+      "name": "Resend",
+      "description": "Transactional email: send, domains, contacts, broadcasts, audiences",
+      "npm_package": null,
+      "hosted_mcp_url": null,
+      "mcp_server_default_name": "resend",
+      "env_var": "RESEND_API_KEY",
+      "rest_endpoint": "https://api.resend.com",
+      "auth": {
+        "type": "bearer",
+        "header": "Authorization",
+        "format": "Bearer {token}"
+      },
+      "docs": "https://resend.com/docs/api-reference",
+      "key_format": "re_*",
+      "signup_url": "https://resend.com/api-keys",
+      "key_format_regex": "^re_[A-Za-z0-9_]+$",
+      "key_example": "re_*",
+      "friction": "low",
+      "friction_note": "free 3k emails/month; ~1 min signup",
+      "baseline_tokens": 2500,
+      "verified": true
+    },
+    "sentry": {
+      "category": "A",
+      "name": "Sentry",
+      "description": "Error tracking: projects, issues, events, releases, session replays",
+      "npm_package": null,
+      "hosted_mcp_url": "https://mcp.sentry.dev",
+      "mcp_server_default_name": "sentry",
+      "env_var": "SENTRY_AUTH_TOKEN",
+      "rest_endpoint": "https://sentry.io/api/0",
+      "auth": {
+        "type": "bearer",
+        "header": "Authorization",
+        "format": "Bearer {token}"
+      },
+      "docs": "https://docs.sentry.io/api/",
+      "key_format": "sntrys_* or opaque",
+      "signup_url": "https://sentry.io/settings/account/api/auth-tokens/",
+      "key_format_regex": "^[A-Za-z0-9_.-]{20,}$",
+      "key_example": "sntrys_* or opaque hex",
+      "friction": "low",
+      "friction_note": "free tier 5k events/month; ~2 min for token with scopes",
+      "baseline_tokens": 5000,
+      "verified": true
+    },
+    "posthog": {
+      "category": "A",
+      "name": "PostHog",
+      "description": "Product analytics: events, insights, feature flags, experiments, session replays",
+      "npm_package": null,
+      "hosted_mcp_url": "https://mcp.posthog.com",
+      "mcp_server_default_name": "posthog",
+      "env_var": "POSTHOG_PERSONAL_API_KEY",
+      "alt_env_vars": [
+        "POSTHOG_API_KEY"
+      ],
+      "rest_endpoint": "https://us.posthog.com/api",
+      "alt_rest_endpoints": {
+        "eu": "https://eu.posthog.com/api"
+      },
+      "auth": {
+        "type": "bearer",
+        "header": "Authorization",
+        "format": "Bearer {token}"
+      },
+      "docs": "https://posthog.com/docs/api",
+      "key_format": "phx_*",
+      "signup_url": "https://us.posthog.com/settings/user-api-keys",
+      "key_format_regex": "^phx_[A-Za-z0-9_-]+$",
+      "key_example": "phx_*",
+      "friction": "low",
+      "friction_note": "free tier 1M events/month; ~1 min; note US vs EU instance",
+      "baseline_tokens": 4000,
+      "verified": true
+    },
+    "lemonsqueezy": {
+      "category": "A",
+      "name": "Lemon Squeezy",
+      "description": "Payments for digital products: stores, products, orders, customers, subscriptions, license keys",
+      "npm_package": null,
+      "hosted_mcp_url": null,
+      "mcp_server_default_name": "lemonsqueezy",
+      "env_var": "LEMONSQUEEZY_API_KEY",
+      "rest_endpoint": "https://api.lemonsqueezy.com/v1",
+      "auth": {
+        "type": "bearer",
+        "header": "Authorization",
+        "format": "Bearer {token}",
+        "extra_headers": {
+          "Accept": "application/vnd.api+json",
+          "Content-Type": "application/vnd.api+json"
+        }
+      },
+      "docs": "https://docs.lemonsqueezy.com/api",
+      "key_format": "JWT-like (eyJ*)",
+      "signup_url": "https://app.lemonsqueezy.com/settings/api",
+      "key_format_regex": "^eyJ[A-Za-z0-9_.\\-]+$",
+      "key_example": "eyJ* (JWT)",
+      "friction": "low",
+      "friction_note": "free to sign up; takes a cut per transaction (MoR \u2014 handles tax)",
+      "baseline_tokens": 5000,
+      "verified": true
+    },
+    "discord": {
+      "category": "A",
+      "name": "Discord",
+      "description": "Bot messaging: channels, messages, DMs, guilds, roles, webhooks",
+      "npm_package": null,
+      "hosted_mcp_url": null,
+      "mcp_server_default_name": "discord",
+      "env_var": "DISCORD_BOT_TOKEN",
+      "rest_endpoint": "https://discord.com/api/v10",
+      "auth": {
+        "type": "custom-prefix",
+        "header": "Authorization",
+        "format": "Bot {token}",
+        "note": "Discord uses 'Bot <TOKEN>' NOT 'Bearer <TOKEN>'. OAuth2 access tokens use Bearer."
+      },
+      "docs": "https://discord.com/developers/docs/reference",
+      "key_format": "opaque (70+ chars with dots)",
+      "signup_url": "https://discord.com/developers/applications",
+      "key_format_regex": "^[A-Za-z0-9_.-]{50,}$",
+      "key_example": "MTk4NjIyNDgzNDcxOTI1MjQ4.Gj_X.....",
+      "friction": "medium",
+      "friction_note": "create an application + bot + copy token; ~5 min first time",
+      "baseline_tokens": 5000,
+      "verified": true
+    },
+    "wellread": {
+      "category": "A",
+      "name": "Wellread",
+      "description": "Collective research memory: search prior research, save findings, karma stats",
+      "npm_package": null,
+      "hosted_mcp_url": "https://wellread-production.up.railway.app/mcp",
+      "mcp_server_default_name": "wellread",
+      "env_var": "WELLREAD_API_KEY",
+      "rest_endpoint": "https://wellread-production.up.railway.app/mcp",
+      "api_style": "mcp-http",
+      "auth": {
+        "type": "bearer",
+        "header": "Authorization",
+        "format": "Bearer {token}",
+        "note": "MCP Streamable HTTP transport. Capture Mcp-Session-Id from initialize response headers and echo it on every subsequent call."
+      },
+      "docs": "https://wellread-production.up.railway.app/mcp",
+      "key_format": "wr_* (32 hex)",
+      "signup_url": "https://wellread-production.up.railway.app/register",
+      "key_format_regex": "^wr_[a-f0-9]{32}$",
+      "key_example": "wr_...",
+      "friction": "none",
+      "friction_note": "auto-registration via POST /register \u2014 no signup page, anonymous, instant",
+      "auth_flow": "auto-register",
+      "register_url": "https://wellread-production.up.railway.app/register",
+      "register_body": {
+        "clients": [
+          "claude-code"
+        ]
+      },
+      "register_response_key": "api_key",
+      "verified": true,
+      "baseline_tokens_measured": 1802,
+      "baseline_tokens_measured_date": "2026-04-22",
+      "baseline_tokens_measured_tools": 3
+    }
+  }
+}

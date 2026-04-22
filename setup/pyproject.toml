@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "teleport-setup"
+version = "0.7.1"
+description = "Detect installed Claude Code MCPs and migrate credentials to env vars so teleport skills can bypass MCP servers via HTTP."
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "mnlt" }]
+readme = "README.md"
+dependencies = [
+    "rich>=13",
+    "questionary>=2",
+]
+
+[project.urls]
+Homepage = "https://github.com/mnlt/teleport"
+Source = "https://github.com/mnlt/teleport/tree/main/setup"
+
+[project.scripts]
+teleport-setup = "teleport_setup:main"
+
+[tool.setuptools]
+py-modules = ["teleport_setup"]
