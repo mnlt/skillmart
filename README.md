@@ -14,11 +14,11 @@ MCP acts like a GUI for AI agents. Teleport replaces that with simple credential
 
 > **Want teleport to support an MCP?** Thumbs-up (or add it) on the [MCP Request Board](https://github.com/mnlt/teleport/issues/1).
 >
-> **Want to submit your own MCP?** Increase adoption — users discover and use it while coding. See [CONTRIBUTING.md](CONTRIBUTING.md).
+> **Want to submit your own MCP?** Increase adoption - users discover and use it while coding. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## What you save
 
-MCP tool definitions get loaded into every turn. In a multi-server setup, that's tens of thousands of tokens paid upfront — every turn, for schemas the agent may not use. Bigger context windows raise the ceiling, but they don't change the per-turn cost, cache invalidation, or the "process everything the tool returns" problem.
+MCP tool definitions get loaded into every turn. In a multi-server setup, that's tens of thousands of tokens paid upfront - every turn, for schemas the agent may not use. Bigger context windows raise the ceiling, but they don't change the per-turn cost, cache invalidation, or the "process everything the tool returns" problem.
 
 Teleport-loaded skills cost ~400–800 tokens each, only when the agent needs them.
 
@@ -28,7 +28,7 @@ Teleport-loaded skills cost ~400–800 tokens each, only when the agent needs th
 
 **…lazy-load MCPs instead?** Claude Code's tool-search MCP does that. Teleport goes a step further — the MCP server is off entirely, loaded only when the skill fires.
 
-**…handle OAuth like MCP does?** For API-key auth it's just an env var. For OAuth-based MCPs (Notion HTTP, Figma hosted, Atlassian Rovo) there's no OAuth bypass — the user generates a PAT from the service dashboard and teleport stores that. MCP's OAuth handling is genuinely nicer there.
+**…handle OAuth like MCP does?** For API-key auth it's just an env var. For OAuth-based MCPs (Notion HTTP, Figma hosted, Atlassian Rovo) there's no OAuth bypass - the user generates a PAT from the service dashboard and teleport stores that. MCP's OAuth handling is genuinely nicer there.
 
 ## 1. Install
 
@@ -44,7 +44,7 @@ Installs the `teleport-setup` CLI into `~/.local/bin` and the `teleport` meta-sk
 teleport-setup
 ```
 
-Scans your installed MCPs, auto-migrates the ones whose credentials are already in the MCP's env block (copies them to `~/.claude/settings.local.json` and adds the MCP to `disabledMcpServers[]`), and walks you through the rest. Then restart Claude Code (`/exit`, then `claude`) and ask naturally — the agent calls the service's REST API directly via the matching skill.
+Scans your installed MCPs, auto-migrates the ones whose credentials are already in the MCP's env block (copies them to `~/.claude/settings.local.json` and adds the MCP to `disabledMcpServers[]`), and walks you through the rest. Then restart Claude Code (`/exit`, then `claude`) and ask naturally - the agent calls the service's REST API directly via the matching skill.
 
 Need a credential later?
 
@@ -68,12 +68,12 @@ Not every MCP stores its credential somewhere teleport can read. Both paths end 
 
 | Path | When it applies | What teleport does | User effort |
 |------|-----------------|--------------------|-------------|
-| **One-click migration** | Credential already in the MCP's `env` block in `~/.claude.json` — most self-hosted stdio MCPs (GitHub, Slack, Stripe, Supabase, Linear, etc. installed with `--env`) | Copies the credential to `settings.local.json`, disables the MCP | Zero typing |
+| **One-click migration** | Credential already in the MCP's `env` block in `~/.claude.json` - most self-hosted stdio MCPs (GitHub, Slack, Stripe, Supabase, Linear, etc. installed with `--env`) | Copies the credential to `settings.local.json`, disables the MCP | Zero typing |
 | **Generate-and-paste** | Hosted / OAuth-based MCPs (Notion HTTP, Figma hosted, Atlassian Rovo) where the token lives in a Claude Code cache teleport can't access | Opens the signup page, you generate an API token, paste it (masked input) | One extra step, handled inline |
 
 ## Supported MCPs
 
-21 MCP-wrapper skills — credential check, imperative "run `teleport-setup add-key`" guidance, and curl recipes for the common operations:
+21 MCP-wrapper skills - credential check, imperative "run `teleport-setup add-key`" guidance, and curl recipes for the common operations:
 
 Context7 · GitHub · Slack · Notion · Linear · Figma · Jira · Exa · Stripe · Supabase · Vercel · Netlify · Cloudflare · Railway · Resend · Sentry · PostHog · Lemon Squeezy · Discord · Wellread · n8n
 
@@ -81,7 +81,7 @@ Context7 · GitHub · Slack · Notion · Linear · Figma · Jira · Exa · Strip
 
 1. Read `~/.claude.json` → find installed MCPs and any credentials in their `env` blocks.
 2. For each MCP matched in `mcp-knowledge.json`, copy the credential to `~/.claude/settings.local.json` under `env`.
-3. Add the MCP name to `disabledMcpServers[]` in the same config — the server stops loading, its tool schemas disappear from the agent's context.
+3. Add the MCP name to `disabledMcpServers[]` in the same config - the server stops loading, its tool schemas disappear from the agent's context.
 4. When you ask for something that service covers, the agent loads the matching skill from the teleport catalog, reads the env var, and hits the REST API.
 
 Reversible at any time:
@@ -94,22 +94,22 @@ claude mcp enable <name>
 
 Teleport also ships self-contained skills:
 
-- **10 from [`anthropics/skills`](https://github.com/anthropics/skills)** — pdf, docx, xlsx, pptx, canvas-design, webapp-testing, mcp-builder, frontend-design, algorithmic-art, slack-gif-creator.
+- **10 from [`anthropics/skills`](https://github.com/anthropics/skills)** - pdf, docx, xlsx, pptx, canvas-design, webapp-testing, mcp-builder, frontend-design, algorithmic-art, slack-gif-creator.
 
 All fetched on-demand from `/tmp/` when you ask for something they cover; nothing persists in `~/.claude/skills/`.
 
 ## Catalog
 
-See [catalog.json](./catalog.json) — 45 entries (21 MCP-wrappers + 24 self-contained skills. Each skill's license is governed by its upstream `source_repo`.
+See [catalog.json](./catalog.json) - 45 entries (21 MCP-wrappers + 24 self-contained skills. Each skill's license is governed by its upstream `source_repo`.
 
 ## Design notes
 
-- **Disable, don't delete:** `disabledMcpServers[]` keeps the config intact — enable any server again with one command.
+- **Disable, don't delete:** `disabledMcpServers[]` keeps the config intact - enable any server again with one command.
 - **Credentials never echo:** the credential check uses `[ -n "$VAR" ] && echo PRESENT || echo MISSING` so values never leak to the transcript.
-- **Imperative skill guidance:** when a credential is missing, the skill instructs the agent to respond with a specific `teleport-setup add-key <service>` message verbatim — no paraphrasing, no suggestions to hand-edit `settings.local.json`.
+- **Imperative skill guidance:** when a credential is missing, the skill instructs the agent to respond with a specific `teleport-setup add-key <service>` message verbatim - no paraphrasing, no suggestions to hand-edit `settings.local.json`.
 - **No runtime deps beyond `curl`, Python 3.10+, and Claude Code.**
 
 ## Caveats
 
-- **Claude Code only.** Leans on Claude (Sonnet/Opus) knowing the popular REST APIs. Smaller or weaker models — local LLMs, other cloud providers — won't work the same way. For obscure APIs the skill contains the curl recipe so the model's prior knowledge matters less; but the baseline assumption is Claude Code + Sonnet or Opus.
+- **Claude Code only.** Leans on Claude (Sonnet/Opus) knowing the popular REST APIs. Smaller or weaker models - local LLMs, other cloud providers - won't work the same way. For obscure APIs the skill contains the curl recipe so the model's prior knowledge matters less; but the baseline assumption is Claude Code + Sonnet or Opus.
 - Self-contained skills that need Python packages, browsers, or system tools still require those installed locally.
