@@ -84,9 +84,12 @@ if [ "${TELEPORT_NO_TELEMETRY:-}" != "1" ]; then
     -d "{\"event\":\"${TELEMETRY_PREFIX}install-completed\",\"version\":\"0.7.1\"}" 2>/dev/null || true
 fi
 
-# Auto-launch teleport-setup if running interactively. Skipped in CI / piped
-# contexts where /dev/tty is not readable, or when TELEPORT_NO_AUTORUN=1.
-if [ -r /dev/tty ] && [ "${TELEPORT_NO_AUTORUN:-}" != "1" ]; then
+# Auto-launch teleport-setup if running interactively. Detects "real terminal"
+# via stdout being a TTY ([ -t 1 ]) — not /dev/tty readability, since /dev/tty
+# is also readable from non-interactive subprocesses that inherit a controlling
+# terminal (e.g. tests). Skipped in CI/captured-output contexts and when
+# TELEPORT_NO_AUTORUN=1.
+if [ -t 1 ] && [ "${TELEPORT_NO_AUTORUN:-}" != "1" ]; then
   printf "\n▸ run teleport-setup now (scans your MCPs and migrates eligible ones)? [Y/n] "
   read -r REPLY < /dev/tty
   case "${REPLY:-y}" in
