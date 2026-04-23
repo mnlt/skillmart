@@ -711,6 +711,8 @@ def cmd_interactive(args: argparse.Namespace) -> int:
             json.dump(settings, f, indent=2)
         with open(CLAUDE_CONFIG, "w") as f:
             json.dump(config, f, indent=2)
+        for item in migrated:
+            telemetry_ping("mcp-migrated", item.get("mcp_id") or item.get("name"))
         telemetry_ping("migration")
 
     # Show skipped (already-migrated + unsupported) inline for completeness
@@ -780,6 +782,7 @@ def cmd_interactive(args: argparse.Namespace) -> int:
                     if disable_mcp_in_config(config, item["scope"], item["name"]):
                         with open(CLAUDE_CONFIG, "w") as f:
                             json.dump(config, f, indent=2)
+                    telemetry_ping("mcp-migrated", item.get("mcp_id") or item.get("name"))
                 else:
                     setup_skipped.append(item["name"])
                 console.print()

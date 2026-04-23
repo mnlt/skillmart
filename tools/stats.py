@@ -144,6 +144,30 @@ def print_catalog_gaps(stats: dict, known: set, n: int = 15) -> None:
     print()
 
 
+def print_migration_per_mcp(stats: dict, n: int = 15) -> None:
+    """Per-MCP migration counts: how often each specific MCP got migrated.
+    Compared against mcp-detected to see which MCPs users commit to vs bail on."""
+    detected: dict = {}
+    migrated: dict = {}
+    for k, v in stats.items():
+        if k.startswith("mcp-detected/"):
+            detected[k.split("/", 1)[1]] = v
+        elif k.startswith("mcp-migrated/"):
+            migrated[k.split("/", 1)[1]] = v
+
+    if not migrated:
+        return
+
+    rule("MIGRATIONS PER MCP")
+    ids = sorted(set(detected) | set(migrated), key=lambda s: -migrated.get(s, 0))
+    print(f"  {'id':<25} {'detected':>9} {'migrated':>10} {'conv':>6}")
+    for id_ in ids[:n]:
+        d = detected.get(id_, 0)
+        m = migrated.get(id_, 0)
+        print(f"  {id_:<25} {d:>9} {m:>10} {pct(m, d):>6}")
+    print()
+
+
 def print_top_skills(stats: dict, n: int = 10) -> None:
     used = [
         (k[len("skill-used/"):], v)
@@ -176,6 +200,7 @@ def main() -> int:
         stats, "add-key-started/", "add-key-completed/",
         "ADD-KEY FUNNEL (per service)",
     )
+    print_migration_per_mcp(stats)
     print_discovery_funnel(stats)
     known = fetch_known_ids()
     print_catalog_gaps(stats, known)
