@@ -9,11 +9,22 @@ import sys
 import urllib.request
 
 COUNTER_URL = "https://teleport.mnlt.deno.net"
+CATALOG_URL = "https://raw.githubusercontent.com/mnlt/teleport/main/catalog.json"
 
 
 def fetch_stats() -> dict:
     with urllib.request.urlopen(f"{COUNTER_URL}/stats", timeout=10) as r:
         return json.loads(r.read())
+
+
+def fetch_known_ids() -> set:
+    """Return set of lowercased ids currently in the catalog."""
+    try:
+        with urllib.request.urlopen(CATALOG_URL, timeout=5) as r:
+            d = json.loads(r.read())
+        return {s["id"].lower() for s in d.get("skills", [])}
+    except Exception:
+        return set()
 
 
 def pct(a: int, b: int) -> str:
@@ -33,11 +44,20 @@ def print_install_funnel(stats: dict) -> None:
     first = stats.get("first-run", 0)
     migr = stats.get("migration", 0)
 
+    # Average MCPs per user = total MCP detections / first-run users
+    total_detections = sum(
+        v for k, v in stats.items()
+        if k.startswith("mcp-detected/") or k.startswith("mcp-detected-unknown/")
+    )
+    avg = total_detections / first if first else 0
+
     rule("INSTALL FUNNEL")
     print(f"  install-started       {started:>6}")
     print(f"  install-completed     {completed:>6}   {pct(completed, started):>5} of started")
     print(f"  first-run             {first:>6}   {pct(first, completed):>5} of completed")
     print(f"  migration             {migr:>6}   {pct(migr, first):>5} of first-run")
+    if first:
+        print(f"  avg MCPs per user     {avg:>6.1f}   ({total_detections} detections / {first} users)")
     print()
 
 
@@ -93,18 +113,34 @@ def print_discovery_funnel(stats: dict) -> None:
     print()
 
 
-def print_catalog_gaps(stats: dict, n: int = 15) -> None:
-    """MCPs users have installed that aren't in the catalog yet."""
-    unknown = [
-        (k[len("mcp-detected-unknown/"):], v)
-        for k, v in stats.items() if k.startswith("mcp-detected-unknown/")
-    ]
+def print_catalog_gaps(stats: dict, known: set, n: int = 15) -> None:
+    """MCPs users have installed that aren't in the catalog yet.
+    Filters out names that already match a catalog id (substring, either direction)
+    so recently-integrated services don't linger in the gaps list.
+    """
+    unknown = []
+    hidden_integrated = 0
+    for k, v in stats.items():
+        if not k.startswith("mcp-detected-unknown/"):
+            continue
+        name = k[len("mcp-detected-unknown/"):]
+        lname = name.lower()
+        if any(kid in lname or lname in kid for kid in known):
+            hidden_integrated += 1
+            continue
+        unknown.append((name, v))
     if not unknown:
+        if hidden_integrated:
+            rule("CATALOG GAPS")
+            print(f"  (none — all previously-unsupported MCPs are now in the catalog)")
+            print()
         return
     unknown.sort(key=lambda x: -x[1])
-    rule(f"CATALOG GAPS (unsupported MCPs seen — candidates to add)")
+    rule("CATALOG GAPS (unsupported MCPs seen — candidates to add)")
     for i, (name, v) in enumerate(unknown[:n], 1):
         print(f"  {i:>2}. {name:<30} {v:>4}")
+    if hidden_integrated:
+        print(f"  [dim]({hidden_integrated} historical entry(ies) hidden — already integrated)[/dim]".replace("[dim]", "").replace("[/dim]", ""))
     print()
 
 
@@ -141,7 +177,8 @@ def main() -> int:
         "ADD-KEY FUNNEL (per service)",
     )
     print_discovery_funnel(stats)
-    print_catalog_gaps(stats)
+    known = fetch_known_ids()
+    print_catalog_gaps(stats, known)
     print_top_skills(stats)
     return 0
 
