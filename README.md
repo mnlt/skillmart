@@ -50,8 +50,10 @@ Opens the signup page, validates the format, saves it with masked input.
 
 ## Use
 
+Teleport can activate on its own, but if you want to be sure, drop "use teleport" in your prompt
+
 ```bash
-How do I ... **use teleport**
+How do I set up Next.js 15 app with Auth.js ... use teleport
 ```
 
 ## Two paths, depending on how the MCP was installed
