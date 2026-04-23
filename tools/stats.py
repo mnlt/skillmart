@@ -38,6 +38,13 @@ def rule(title: str) -> None:
     print("─" * max(len(title), 12))
 
 
+def print_users(stats: dict) -> None:
+    users = stats.get("install-completed", 0)
+    print()
+    print(f"  👤 {users} user{'' if users == 1 else 's'}  [installed successfully]")
+    print()
+
+
 def print_install_funnel(stats: dict) -> None:
     started = stats.get("install-started", 0)
     completed = stats.get("install-completed", 0)
@@ -194,7 +201,7 @@ def main() -> int:
         print("(no data yet)")
         return 0
 
-    print()
+    print_users(stats)
     print_install_funnel(stats)
     print_per_service_funnel(
         stats, "add-key-started/", "add-key-completed/",
