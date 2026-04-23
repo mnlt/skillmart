@@ -7,450 +7,751 @@
       "type": "skill",
       "name": "PDF",
       "description": "Work with PDF files: read, extract text, forms, and tables",
-      "tags": ["pdf", "document", "extraction", "forms"],
+      "tags": [
+        "pdf",
+        "document",
+        "extraction",
+        "forms"
+      ],
       "source_repo": "anthropics/skills",
       "path": "skills/pdf",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "docx",
       "type": "skill",
       "name": "Word Documents",
       "description": "Create, read, and edit Microsoft Word .docx files",
-      "tags": ["word", "docx", "document", "office"],
+      "tags": [
+        "word",
+        "docx",
+        "document",
+        "office"
+      ],
       "source_repo": "anthropics/skills",
       "path": "skills/docx",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "xlsx",
       "type": "skill",
       "name": "Excel Spreadsheets",
       "description": "Create, read, and edit Excel .xlsx spreadsheets",
-      "tags": ["excel", "xlsx", "spreadsheet", "office"],
+      "tags": [
+        "excel",
+        "xlsx",
+        "spreadsheet",
+        "office"
+      ],
       "source_repo": "anthropics/skills",
       "path": "skills/xlsx",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "pptx",
       "type": "skill",
       "name": "PowerPoint Presentations",
       "description": "Create and edit PowerPoint .pptx presentations",
-      "tags": ["powerpoint", "pptx", "presentation", "slides"],
+      "tags": [
+        "powerpoint",
+        "pptx",
+        "presentation",
+        "slides"
+      ],
       "source_repo": "anthropics/skills",
       "path": "skills/pptx",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "canvas-design",
       "type": "skill",
       "name": "Canvas Design",
       "description": "Create visual designs, posters, and graphics",
-      "tags": ["design", "graphics", "visual", "poster"],
+      "tags": [
+        "design",
+        "graphics",
+        "visual",
+        "poster"
+      ],
       "source_repo": "anthropics/skills",
       "path": "skills/canvas-design",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "webapp-testing",
       "type": "skill",
       "name": "Web App Testing",
       "description": "Test web applications using browser automation",
-      "tags": ["testing", "web", "browser", "automation"],
+      "tags": [
+        "testing",
+        "web",
+        "browser",
+        "automation"
+      ],
       "source_repo": "anthropics/skills",
       "path": "skills/webapp-testing",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "mcp-builder",
       "type": "skill",
       "name": "MCP Builder",
       "description": "Build and scaffold MCP servers",
-      "tags": ["mcp", "server", "development", "builder"],
+      "tags": [
+        "mcp",
+        "server",
+        "development",
+        "builder"
+      ],
       "source_repo": "anthropics/skills",
       "path": "skills/mcp-builder",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "frontend-design",
       "type": "skill",
       "name": "Frontend Design",
       "description": "Design and build frontend interfaces and components",
-      "tags": ["frontend", "design", "ui", "components"],
+      "tags": [
+        "frontend",
+        "design",
+        "ui",
+        "components"
+      ],
       "source_repo": "anthropics/skills",
       "path": "skills/frontend-design",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "algorithmic-art",
       "type": "skill",
       "name": "Algorithmic Art",
       "description": "Create generative and algorithmic visual art",
-      "tags": ["art", "generative", "creative", "visual"],
+      "tags": [
+        "art",
+        "generative",
+        "creative",
+        "visual"
+      ],
       "source_repo": "anthropics/skills",
       "path": "skills/algorithmic-art",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "slack-gif-creator",
       "type": "skill",
       "name": "Slack GIF Creator",
       "description": "Create animated GIFs suitable for Slack and chat",
-      "tags": ["gif", "animation", "slack", "chat"],
+      "tags": [
+        "gif",
+        "animation",
+        "slack",
+        "chat"
+      ],
       "source_repo": "anthropics/skills",
       "path": "skills/slack-gif-creator",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "context7",
       "type": "mcp-wrapper",
       "name": "Context7",
       "description": "Fetch up-to-date library documentation via Context7. Use when the user asks about libraries, frameworks, APIs, or SDKs (React, Next.js, Prisma, Supabase, Tailwind, Django, Vue, etc). Bypasses MCP via HTTP API with CONTEXT7_API_KEY env var.",
-      "tags": ["docs", "libraries", "frameworks", "api", "mcp-wrapper", "context7"],
+      "tags": [
+        "docs",
+        "libraries",
+        "frameworks",
+        "api",
+        "mcp-wrapper",
+        "context7"
+      ],
       "source_repo": "mnlt/teleport",
       "path": "skills/context7",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "github",
       "type": "mcp-wrapper",
       "name": "GitHub",
-      "description": "Operate on GitHub via REST API — repos, PRs, issues, code search, releases. Bypasses MCP via HTTP with GITHUB_TOKEN env var.",
-      "tags": ["github", "git", "pr", "issues", "code", "repo", "mcp-wrapper"],
+      "description": "Operate on GitHub via REST API \u2014 repos, PRs, issues, code search, releases. Bypasses MCP via HTTP with GITHUB_TOKEN env var.",
+      "tags": [
+        "github",
+        "git",
+        "pr",
+        "issues",
+        "code",
+        "repo",
+        "mcp-wrapper"
+      ],
       "source_repo": "mnlt/teleport",
       "path": "skills/github",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "slack",
       "type": "mcp-wrapper",
       "name": "Slack",
       "description": "Send messages, read channels, search Slack via REST API. Bypasses MCP via HTTP with SLACK_BOT_TOKEN env var.",
-      "tags": ["slack", "messaging", "chat", "channels", "mcp-wrapper"],
+      "tags": [
+        "slack",
+        "messaging",
+        "chat",
+        "channels",
+        "mcp-wrapper"
+      ],
       "source_repo": "mnlt/teleport",
       "path": "skills/slack",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "notion",
       "type": "mcp-wrapper",
       "name": "Notion",
       "description": "Create/edit pages, databases, tasks in Notion via REST API. Bypasses MCP via HTTP with NOTION_API_KEY env var.",
-      "tags": ["notion", "pages", "databases", "docs", "knowledge", "mcp-wrapper"],
+      "tags": [
+        "notion",
+        "pages",
+        "databases",
+        "docs",
+        "knowledge",
+        "mcp-wrapper"
+      ],
       "source_repo": "mnlt/teleport",
       "path": "skills/notion",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "linear",
       "type": "mcp-wrapper",
       "name": "Linear",
       "description": "Create/update issues, projects, cycles in Linear via GraphQL API. Bypasses MCP via HTTP with LINEAR_API_KEY env var.",
-      "tags": ["linear", "issues", "projects", "tracking", "graphql", "mcp-wrapper"],
+      "tags": [
+        "linear",
+        "issues",
+        "projects",
+        "tracking",
+        "graphql",
+        "mcp-wrapper"
+      ],
       "source_repo": "mnlt/teleport",
       "path": "skills/linear",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "figma",
       "type": "mcp-wrapper",
       "name": "Figma",
       "description": "Read Figma files, components, export assets via REST API. Bypasses MCP via HTTP with FIGMA_ACCESS_TOKEN env var.",
-      "tags": ["figma", "design", "components", "assets", "mcp-wrapper"],
+      "tags": [
+        "figma",
+        "design",
+        "components",
+        "assets",
+        "mcp-wrapper"
+      ],
       "source_repo": "mnlt/teleport",
       "path": "skills/figma",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "jira",
       "type": "mcp-wrapper",
       "name": "Jira",
       "description": "Create/query issues, boards, sprints in Jira Cloud via REST API. Bypasses MCP via HTTP with JIRA_EMAIL + JIRA_API_TOKEN + JIRA_BASE_URL env vars.",
-      "tags": ["jira", "atlassian", "issues", "tracking", "sprints", "mcp-wrapper"],
+      "tags": [
+        "jira",
+        "atlassian",
+        "issues",
+        "tracking",
+        "sprints",
+        "mcp-wrapper"
+      ],
       "source_repo": "mnlt/teleport",
       "path": "skills/jira",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "exa",
       "type": "mcp-wrapper",
       "name": "Exa Search",
-      "description": "AI-first web search via Exa API — semantic search, answer synthesis. Bypasses MCP via HTTP with EXA_API_KEY env var.",
-      "tags": ["exa", "search", "web-search", "ai-search", "mcp-wrapper"],
+      "description": "AI-first web search via Exa API \u2014 semantic search, answer synthesis. Bypasses MCP via HTTP with EXA_API_KEY env var.",
+      "tags": [
+        "exa",
+        "search",
+        "web-search",
+        "ai-search",
+        "mcp-wrapper"
+      ],
       "source_repo": "mnlt/teleport",
       "path": "skills/exa",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "stripe",
       "type": "mcp-wrapper",
       "name": "Stripe",
       "description": "Query/manage payments, customers, subscriptions, invoices via Stripe API. Bypasses MCP via HTTP with STRIPE_API_KEY env var.",
-      "tags": ["stripe", "payments", "customers", "subscriptions", "billing", "mcp-wrapper"],
+      "tags": [
+        "stripe",
+        "payments",
+        "customers",
+        "subscriptions",
+        "billing",
+        "mcp-wrapper"
+      ],
       "source_repo": "mnlt/teleport",
       "path": "skills/stripe",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "supabase",
       "type": "mcp-wrapper",
       "name": "Supabase",
       "description": "Manage Supabase projects, query databases, auth, storage via Management API or Project REST. Bypasses MCP via HTTP with SUPABASE_ACCESS_TOKEN (management) or SUPABASE_URL + SUPABASE_ANON_KEY/SUPABASE_SERVICE_ROLE_KEY (per-project) env vars.",
-      "tags": ["supabase", "database", "postgres", "auth", "storage", "backend", "mcp-wrapper"],
+      "tags": [
+        "supabase",
+        "database",
+        "postgres",
+        "auth",
+        "storage",
+        "backend",
+        "mcp-wrapper"
+      ],
       "source_repo": "mnlt/teleport",
       "path": "skills/supabase",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "vercel",
       "type": "mcp-wrapper",
       "name": "Vercel",
       "description": "Manage Vercel deployments, projects, env vars, domains, and DNS via REST API. Bypasses MCP via HTTP with VERCEL_TOKEN env var.",
-      "tags": ["vercel", "deploy", "hosting", "serverless", "env-vars", "dns", "mcp-wrapper"],
+      "tags": [
+        "vercel",
+        "deploy",
+        "hosting",
+        "serverless",
+        "env-vars",
+        "dns",
+        "mcp-wrapper"
+      ],
       "source_repo": "mnlt/teleport",
       "path": "skills/vercel",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "netlify",
       "type": "mcp-wrapper",
       "name": "Netlify",
       "description": "Manage Netlify sites, deploys, functions, env vars, forms, and domains via REST API. Bypasses MCP via HTTP with NETLIFY_AUTH_TOKEN env var.",
-      "tags": ["netlify", "deploy", "hosting", "serverless", "forms", "mcp-wrapper"],
+      "tags": [
+        "netlify",
+        "deploy",
+        "hosting",
+        "serverless",
+        "forms",
+        "mcp-wrapper"
+      ],
       "source_repo": "mnlt/teleport",
       "path": "skills/netlify",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "cloudflare",
       "type": "mcp-wrapper",
       "name": "Cloudflare",
       "description": "Manage Cloudflare DNS, Workers, Pages, R2, KV, D1, and analytics via REST API. Bypasses MCP via HTTP with CLOUDFLARE_API_TOKEN env var.",
-      "tags": ["cloudflare", "dns", "workers", "pages", "r2", "kv", "d1", "edge", "mcp-wrapper"],
+      "tags": [
+        "cloudflare",
+        "dns",
+        "workers",
+        "pages",
+        "r2",
+        "kv",
+        "d1",
+        "edge",
+        "mcp-wrapper"
+      ],
       "source_repo": "mnlt/teleport",
       "path": "skills/cloudflare",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "railway",
       "type": "mcp-wrapper",
       "name": "Railway",
       "description": "Manage Railway projects, services, deployments, environments, and logs via GraphQL API. Bypasses MCP via HTTP with RAILWAY_TOKEN env var.",
-      "tags": ["railway", "deploy", "hosting", "graphql", "mcp-wrapper"],
+      "tags": [
+        "railway",
+        "deploy",
+        "hosting",
+        "graphql",
+        "mcp-wrapper"
+      ],
       "source_repo": "mnlt/teleport",
       "path": "skills/railway",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "resend",
       "type": "mcp-wrapper",
       "name": "Resend",
       "description": "Send transactional emails, manage domains, contacts, audiences, and broadcasts via REST API. Bypasses MCP via HTTP with RESEND_API_KEY env var.",
-      "tags": ["resend", "email", "transactional", "broadcast", "mcp-wrapper"],
+      "tags": [
+        "resend",
+        "email",
+        "transactional",
+        "broadcast",
+        "mcp-wrapper"
+      ],
       "source_repo": "mnlt/teleport",
       "path": "skills/resend",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "sentry",
       "type": "mcp-wrapper",
       "name": "Sentry",
       "description": "Manage Sentry projects, query issues and events, list releases, retrieve session replays via REST API. Bypasses MCP via HTTP with SENTRY_AUTH_TOKEN env var.",
-      "tags": ["sentry", "errors", "monitoring", "observability", "releases", "mcp-wrapper"],
+      "tags": [
+        "sentry",
+        "errors",
+        "monitoring",
+        "observability",
+        "releases",
+        "mcp-wrapper"
+      ],
       "source_repo": "mnlt/teleport",
       "path": "skills/sentry",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "posthog",
       "type": "mcp-wrapper",
       "name": "PostHog",
       "description": "Query PostHog analytics events, insights, feature flags, experiments, session replays, and HogQL via REST API. Bypasses MCP via HTTP with POSTHOG_PERSONAL_API_KEY env var.",
-      "tags": ["posthog", "analytics", "events", "feature-flags", "experiments", "session-replays", "mcp-wrapper"],
+      "tags": [
+        "posthog",
+        "analytics",
+        "events",
+        "feature-flags",
+        "experiments",
+        "session-replays",
+        "mcp-wrapper"
+      ],
       "source_repo": "mnlt/teleport",
       "path": "skills/posthog",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "lemonsqueezy",
       "type": "mcp-wrapper",
       "name": "Lemon Squeezy",
       "description": "Manage Lemon Squeezy stores, products, orders, customers, subscriptions, and license keys via REST API. Bypasses MCP via HTTP with LEMONSQUEEZY_API_KEY env var.",
-      "tags": ["lemonsqueezy", "payments", "mor", "licenses", "subscriptions", "mcp-wrapper"],
+      "tags": [
+        "lemonsqueezy",
+        "payments",
+        "mor",
+        "licenses",
+        "subscriptions",
+        "mcp-wrapper"
+      ],
       "source_repo": "mnlt/teleport",
       "path": "skills/lemonsqueezy",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "discord",
       "type": "mcp-wrapper",
       "name": "Discord",
       "description": "Send messages, manage channels, guilds, roles, and webhooks on Discord via REST API. Bypasses MCP via HTTP with DISCORD_BOT_TOKEN env var.",
-      "tags": ["discord", "bot", "messaging", "channels", "webhooks", "community", "mcp-wrapper"],
+      "tags": [
+        "discord",
+        "bot",
+        "messaging",
+        "channels",
+        "webhooks",
+        "community",
+        "mcp-wrapper"
+      ],
       "source_repo": "mnlt/teleport",
       "path": "skills/discord",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "wellread",
       "type": "mcp-wrapper",
       "name": "Wellread",
-      "description": "Collective research memory for AI coding agents — search prior research before web-searching, save findings, view karma stats. Bypasses the MCP via direct JSON-RPC to the hosted endpoint with auto-registered API key (WELLREAD_API_KEY).",
-      "tags": ["research", "memory", "knowledge-sharing", "collective-intelligence", "mcp-wrapper"],
+      "description": "Collective research memory for AI coding agents \u2014 search prior research before web-searching, save findings, view karma stats. Bypasses the MCP via direct JSON-RPC to the hosted endpoint with auto-registered API key (WELLREAD_API_KEY).",
+      "tags": [
+        "research",
+        "memory",
+        "knowledge-sharing",
+        "collective-intelligence",
+        "mcp-wrapper"
+      ],
       "source_repo": "mnlt/teleport",
       "path": "skills/wellread",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "n8n",
       "type": "mcp-wrapper",
       "name": "n8n",
       "description": "Manage n8n workflow automation: list/get/create/update/trigger workflows, inspect executions, manage credentials. Bypasses the MCP via REST API with N8N_API_KEY + N8N_BASE_URL env vars. Works with self-hosted and n8n Cloud instances.",
-      "tags": ["workflow", "automation", "n8n", "integration", "mcp-wrapper"],
+      "tags": [
+        "workflow",
+        "automation",
+        "n8n",
+        "integration",
+        "mcp-wrapper"
+      ],
       "source_repo": "mnlt/teleport",
       "path": "skills/n8n",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-23"
     },
     {
       "id": "brainstorming",
       "type": "skill",
       "name": "Brainstorming",
       "description": "Structured brainstorming workflow for exploring problem space before committing to a solution.",
-      "tags": ["coding-workflow", "ideation", "superpowers"],
+      "tags": [
+        "coding-workflow",
+        "ideation",
+        "superpowers"
+      ],
       "source_repo": "obra/superpowers",
       "path": "skills/brainstorming",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "dispatching-parallel-agents",
       "type": "skill",
       "name": "Dispatching Parallel Agents",
       "description": "Coordinate multiple agents in parallel for tasks that decompose cleanly into independent subtasks.",
-      "tags": ["coding-workflow", "multi-agent", "parallelism", "superpowers"],
+      "tags": [
+        "coding-workflow",
+        "multi-agent",
+        "parallelism",
+        "superpowers"
+      ],
       "source_repo": "obra/superpowers",
       "path": "skills/dispatching-parallel-agents",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "executing-plans",
       "type": "skill",
       "name": "Executing Plans",
       "description": "Execute a previously written plan step-by-step with checkpoints and verification.",
-      "tags": ["coding-workflow", "planning", "superpowers"],
+      "tags": [
+        "coding-workflow",
+        "planning",
+        "superpowers"
+      ],
       "source_repo": "obra/superpowers",
       "path": "skills/executing-plans",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "finishing-a-development-branch",
       "type": "skill",
       "name": "Finishing a Development Branch",
       "description": "Wrap up a feature branch cleanly: final review, commit hygiene, merge prep.",
-      "tags": ["coding-workflow", "git", "superpowers"],
+      "tags": [
+        "coding-workflow",
+        "git",
+        "superpowers"
+      ],
       "source_repo": "obra/superpowers",
       "path": "skills/finishing-a-development-branch",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "receiving-code-review",
       "type": "skill",
       "name": "Receiving Code Review",
-      "description": "Respond to code review feedback constructively — address comments, update PR, track unresolved items.",
-      "tags": ["coding-workflow", "code-review", "superpowers"],
+      "description": "Respond to code review feedback constructively \u2014 address comments, update PR, track unresolved items.",
+      "tags": [
+        "coding-workflow",
+        "code-review",
+        "superpowers"
+      ],
       "source_repo": "obra/superpowers",
       "path": "skills/receiving-code-review",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "requesting-code-review",
       "type": "skill",
       "name": "Requesting Code Review",
-      "description": "Prepare a PR for review — title, description, test plan, reviewers, and self-review checklist.",
-      "tags": ["coding-workflow", "code-review", "superpowers"],
+      "description": "Prepare a PR for review \u2014 title, description, test plan, reviewers, and self-review checklist.",
+      "tags": [
+        "coding-workflow",
+        "code-review",
+        "superpowers"
+      ],
       "source_repo": "obra/superpowers",
       "path": "skills/requesting-code-review",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "subagent-driven-development",
       "type": "skill",
       "name": "Subagent-Driven Development",
       "description": "Delegate focused subtasks to specialized subagents while maintaining overall direction.",
-      "tags": ["coding-workflow", "multi-agent", "superpowers"],
+      "tags": [
+        "coding-workflow",
+        "multi-agent",
+        "superpowers"
+      ],
       "source_repo": "obra/superpowers",
       "path": "skills/subagent-driven-development",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "systematic-debugging",
       "type": "skill",
       "name": "Systematic Debugging",
       "description": "Structured debugging workflow: reproduce, isolate, hypothesize, verify. Avoid shotgun fixes.",
-      "tags": ["coding-workflow", "debugging", "superpowers"],
+      "tags": [
+        "coding-workflow",
+        "debugging",
+        "superpowers"
+      ],
       "source_repo": "obra/superpowers",
       "path": "skills/systematic-debugging",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "test-driven-development",
       "type": "skill",
       "name": "Test-Driven Development",
       "description": "Strict red-green-refactor TDD workflow. Write the test first, watch it fail, then implement minimally.",
-      "tags": ["coding-workflow", "tdd", "testing", "superpowers"],
+      "tags": [
+        "coding-workflow",
+        "tdd",
+        "testing",
+        "superpowers"
+      ],
       "source_repo": "obra/superpowers",
       "path": "skills/test-driven-development",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "using-git-worktrees",
       "type": "skill",
       "name": "Using Git Worktrees",
-      "description": "Work on multiple branches simultaneously with git worktree — when it's worth the complexity.",
-      "tags": ["coding-workflow", "git", "superpowers"],
+      "description": "Work on multiple branches simultaneously with git worktree \u2014 when it's worth the complexity.",
+      "tags": [
+        "coding-workflow",
+        "git",
+        "superpowers"
+      ],
       "source_repo": "obra/superpowers",
       "path": "skills/using-git-worktrees",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "using-superpowers",
       "type": "skill",
       "name": "Using Superpowers",
       "description": "Meta-skill: how to use the Superpowers workflow suite as a coherent whole.",
-      "tags": ["coding-workflow", "meta", "superpowers"],
+      "tags": [
+        "coding-workflow",
+        "meta",
+        "superpowers"
+      ],
       "source_repo": "obra/superpowers",
       "path": "skills/using-superpowers",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "verification-before-completion",
       "type": "skill",
       "name": "Verification Before Completion",
-      "description": "Verify the work actually works before marking a task done — avoid premature 'done' signals.",
-      "tags": ["coding-workflow", "quality", "superpowers"],
+      "description": "Verify the work actually works before marking a task done \u2014 avoid premature 'done' signals.",
+      "tags": [
+        "coding-workflow",
+        "quality",
+        "superpowers"
+      ],
       "source_repo": "obra/superpowers",
       "path": "skills/verification-before-completion",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "writing-plans",
       "type": "skill",
       "name": "Writing Plans",
-      "description": "Write a concrete implementation plan before writing code — structure, steps, unknowns, verification.",
-      "tags": ["coding-workflow", "planning", "superpowers"],
+      "description": "Write a concrete implementation plan before writing code \u2014 structure, steps, unknowns, verification.",
+      "tags": [
+        "coding-workflow",
+        "planning",
+        "superpowers"
+      ],
       "source_repo": "obra/superpowers",
       "path": "skills/writing-plans",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     },
     {
       "id": "writing-skills",
       "type": "skill",
       "name": "Writing Skills",
       "description": "How to author new skills in the Superpowers / Claude Code skill format.",
-      "tags": ["coding-workflow", "meta", "superpowers"],
+      "tags": [
+        "coding-workflow",
+        "meta",
+        "superpowers"
+      ],
       "source_repo": "obra/superpowers",
       "path": "skills/writing-skills",
-      "ref": "main"
+      "ref": "main",
+      "added_at": "2026-04-22"
     }
   ]
 }
