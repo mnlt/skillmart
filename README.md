@@ -6,7 +6,7 @@
 
 **MCP, but without the MCP.**
 
-MCP is like having all your apps open at the same time (GitHub, Stripe, etc.), so you’ve already burned tokens before the first prompt. Teleport is like opening only the app you need, exactly when you need it—so you only spend tokens when it actually matters.
+MCP is like having all your apps open at the same time (GitHub, Stripe, etc.), so you’ve already burned tokens before the first prompt. Teleport is like opening only the app you need, exactly when you need it - so you only spend tokens when it actually matters.
 
 Context7, Superpowers, GitHub, Stripe… none of them are loaded until they’re actually needed.
 
