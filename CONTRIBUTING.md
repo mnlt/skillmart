@@ -13,7 +13,27 @@ Teleport only catalogs MCPs listed on a registry that runs automated security ch
 
 If your MCP isn't listed on any of the above, get it listed there first, then come back.
 
-## How to propose an MCP
+## Quick path: let Claude do it
+
+Copy this into Claude Code. It fetches the current submission docs + template, asks you the minimum it needs, and hands you a ready-to-paste issue body:
+
+```
+I want to submit an MCP to the teleport catalog. Please:
+
+1. Fetch and read https://raw.githubusercontent.com/mnlt/teleport/main/CONTRIBUTING.md
+   and https://raw.githubusercontent.com/mnlt/teleport/main/skills/_template/SKILL.md.
+2. Ask me for: MCP name, registry link (Anthropic Registry / Smithery / Glama),
+   the service's REST API base URL, auth scheme (bearer / custom header / basic),
+   and 3–5 common operations I'd want Claude to support.
+3. Generate the catalog.json entry, the mcp-knowledge.json entry, and a complete
+   SKILL.md filled in from the template, based on my answers.
+4. Format the whole output as a single GitHub issue body I can copy and paste into
+   https://github.com/mnlt/teleport/issues/new.
+```
+
+When Claude finishes, paste its output into a new issue. The maintainer validates + adds manually.
+
+## Manual path
 
 **Open an issue** (not a PR) at <https://github.com/mnlt/teleport/issues/new> with:
 
