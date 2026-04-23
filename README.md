@@ -8,7 +8,7 @@
 
 Context7, Superpowers, GitHub, Stripe… none of them loaded until you actually need them.
 
-MCP is like having all your apps open at the same time (GitHub, Stripe, etc.), so you’ve already burned tokens before the first prompt. Teleport is like opening only the app you need, exactly when you need it - so you only spend tokens when it actually matters.
+MCP is like having all your apps open at the same time. So you’ve already burned tokens before the first prompt. Teleport is like opening only the app you need, exactly when you need it - so you only spend tokens when it actually matters.
 
 MCP acts like a GUI for AI agents. Teleport replaces that with simple credentials in env vars and small skills loaded on demand. The result: a smaller baseline context per turn and an agent that composes calls instead of blindly consuming whatever an MCP tool returns.
 
