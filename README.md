@@ -6,6 +6,10 @@
 
 **MCP, but without the MCP.**
 
+Teleport replaces your MCPs with curated ephemeral skills that call the REST APIs directly (GitHub, Stripe, Notion…) with credentials in env vars, each loaded on demand — so you avoid having every MCP's schemas injected into context from the first message whether you use them or not.
+
+## So what?
+
 MCP is like having all your apps open at the same time. So you’ve already burned tokens before the first prompt. 
 
 Teleport is like opening only the app you need, exactly when you need it - so you only spend tokens when it actually matters.
