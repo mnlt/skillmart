@@ -81,6 +81,14 @@ Not every MCP stores its credential somewhere teleport can read. Both paths end 
 
 Context7 · GitHub · Superpowers · Slack · Notion · Linear · Figma · Jira · Exa · Stripe · Supabase · Vercel · Netlify · Wellread · Cloudflare · Railway · Resend · Sentry · PostHog · Lemon Squeezy · Discord · n8n
 
+See [catalog.json](./catalog.json) - 45 entries (21 MCP-wrappers + 24 self-contained skills. Each skill's license is governed by its upstream `source_repo`.
+
+Teleport also ships self-contained skills:
+
+- **10 from [`anthropics/skills`](https://github.com/anthropics/skills)** - pdf, docx, xlsx, pptx, canvas-design, webapp-testing, mcp-builder, frontend-design, algorithmic-art, slack-gif-creator.
+
+All fetched on-demand from `/tmp/` when you ask for something they cover; nothing persists in `~/.claude/skills/`.
+
 ## How migration works
 
 1. Read `~/.claude.json` → find installed MCPs and any credentials in their `env` blocks.
@@ -93,18 +101,6 @@ Reversible at any time:
 ```bash
 claude mcp enable <name>
 ```
-
-## Skills (secondary)
-
-Teleport also ships self-contained skills:
-
-- **10 from [`anthropics/skills`](https://github.com/anthropics/skills)** - pdf, docx, xlsx, pptx, canvas-design, webapp-testing, mcp-builder, frontend-design, algorithmic-art, slack-gif-creator.
-
-All fetched on-demand from `/tmp/` when you ask for something they cover; nothing persists in `~/.claude/skills/`.
-
-## Catalog
-
-See [catalog.json](./catalog.json) - 45 entries (21 MCP-wrappers + 24 self-contained skills. Each skill's license is governed by its upstream `source_repo`.
 
 ## Design notes
 
