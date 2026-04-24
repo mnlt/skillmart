@@ -84,9 +84,9 @@ Context7 · GitHub · Superpowers · Slack · Notion · Linear · Figma · Jira 
 ## How migration works
 
 1. Read `~/.claude.json` → find installed MCPs and any credentials in their `env` blocks.
-2. For each MCP matched in `mcp-knowledge.json`, copy the credential to `~/.claude/settings.local.json` under `env`.
-3. Add the MCP name to `disabledMcpServers[]` in the same config - the server stops loading, its tool schemas disappear from the agent's context.
-4. When you ask for something that service covers, the agent loads the matching skill from the teleport catalog, reads the env var, and hits the REST API.
+2. For each MCP matched in `mcp-knowledge.json`, write the credential to `~/.teleport/env.sh` (mode 0600) and append a `source` line to `~/.zshrc` and `~/.bashrc` if they exist. Legacy `env` blocks in `~/.claude/settings.local.json` auto-migrate to `env.sh` on first run.
+3. Add the MCP name to `disabledMcpServers[]` in `~/.claude.json` - the server stops loading, its tool schemas disappear from the agent's context.
+4. When you ask for something that service covers, the agent loads the matching skill from the teleport catalog, reads the env var (sourced by your shell), and hits the REST API.
 
 Reversible at any time:
 
