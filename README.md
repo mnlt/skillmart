@@ -6,7 +6,7 @@
 
 ## MCP, but without the MCP
 
-Teleport replaces your MCPs with curated ephemeral skills that call the REST APIs directly (GitHub, Stripe, Notion…) with credentials in env vars, each loaded on demand — so you avoid having every MCP's schemas injected into context from the first message whether you use them or not.
+Teleport replaces your MCPs with curated ephemeral skills that call the REST APIs directly (GitHub, Stripe, Notion…) with credentials in env vars, each loaded on demand - so you avoid having every MCP's schemas injected into context from the first message whether you use them or not.
 
 ## Wait, what?
 
