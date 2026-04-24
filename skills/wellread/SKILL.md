@@ -1,14 +1,19 @@
 ---
 name: wellread
-description: Collective research memory — search what others have paid to learn, save your own findings, view contribution stats. Use when the user wants to check prior research before running a web search, save new findings, or view wellread stats — without the wellread MCP loaded.
+description: Collective research memory for AI coding agents — search prior research before hitting the web, save findings back to the shared cache, view karma stats. Use when the user asks a library/API/framework question, before running WebSearch/WebFetch, or after deep web research so the next agent doesn't repay the cost. Talks directly to the hosted MCP endpoint via JSON-RPC — no local MCP server required.
 license: MIT (skill wrapper; wellread service terms apply)
 ---
 
 # Wellread
 
-Collective research memory for AI coding agents. Skip re-researching what someone else already paid for.
+Collective memory for AI coding agents — skip re-researching what others paid for. Backend: **MCP Streamable HTTP** (JSON-RPC + session-id header), not REST.
 
-Wellread uses MCP Streamable HTTP — there is no separate REST API. This skill talks to the same MCP endpoint directly via JSON-RPC over HTTP, so the server's tool schemas stay out of your context until you actually need them.
+## Usage
+
+- **Use for:** before `WebSearch`/`WebFetch` on a library/API/framework question; after deep web research (`save`); checking whether prior notes are still `fresh`.
+- **Skip for:** pure code explanation, private-schema work (would leak), trivial questions with no research cost.
+
+Rule of thumb: if the answer depends on *current* public library behavior and you'd otherwise web-search, run `search` first.
 
 ## Credentials check
 
@@ -80,7 +85,22 @@ curl -sS -X POST "https://wellread-production.up.railway.app/mcp" \
 
 The `sed` filter strips the SSE framing so you get raw JSON.
 
+## Freshness semantics
+
+Every entry carries a `volatility` and `last_verified_at`. The server returns a freshness label at search time — consume it, don't recompute.
+
+| Volatility  | `fresh` (use directly) | `check` (spot-verify + `save(verify_id)`) | `stale` (re-research + `save(replaces_id)`) |
+| ----------- | ---------------------- | ----------------------------------------- | ------------------------------------------- |
+| `timeless`  | ≤ 365 days             | never                                     | never (TCP, SQL basics)                     |
+| `stable`    | ≤ 180 days             | 180–365 days                              | > 365 days                                  |
+| `evolving`  | ≤ 30 days              | 30–90 days                                | > 90 days                                   |
+| `volatile`  | ≤ 7 days               | 7–30 days                                 | > 30 days                                   |
+
+Thresholds: `wellread-mcp/src/freshness.ts`. `save` default: `stable`.
+
 ## Tools
+
+Three tools: `search`, `save`, `stats`.
 
 ### search — find prior research
 
@@ -88,14 +108,14 @@ The `sed` filter strips the SSE framing so you get raw JSON.
 {
   "name": "search",
   "arguments": {
-    "query": "sanitized user question with all technical terms",
-    "keywords": "space separated key terms",
-    "hook_version": 11
+    "query": "sanitized user question, technical terms preserved",
+    "keywords": "space separated key technical terms",
+    "agent": "claude-code"
   }
 }
 ```
 
-Returns: matching research entries with freshness (`fresh` / `check` / `stale`) and an ID for `verify_id`/`replaces_id` on later `save`.
+Call FIRST and ALONE before any web search. Strip project names, paths, credentials from `query`/`keywords`; keep library/API terms verbatim. Response: `match` (`full` iff top similarity ≥ 0.70 AND not stale, else `partial`), `freshness` label, result blocks (`id`, `content`, `sources`, `gaps`, `tags`), `nextSteps`, and a `BADGE` to paste verbatim at the end of the user response.
 
 ### save — contribute research back
 
@@ -106,34 +126,41 @@ Returns: matching research entries with freshness (`fresh` / `check` / `stale`) 
     "content": "Dense LLM-consumption notes: API signatures, gotchas, version-specific changes. English only.",
     "search_surface": "[TOPIC]: ...\n[COVERS]: ...\n[TECHNOLOGIES]: ...\n[RELATED]: ...\n[SOLVES]: ...",
     "sources": ["https://..."],
-    "tags": ["tag1", "tag2"],
-    "tool_calls": ["WebSearch: query", "WebFetch: url"],
+    "tags": ["tag1"],
+    "tool_calls": ["WebSearch: query", "WebFetch: https://..."],
     "gaps": ["unexplored angle"],
     "volatility": "evolving",
-    "verify_id": "existing-id-if-just-confirming"
+    "replaces_id": "optional-id-being-superseded",
+    "verify_id": "optional-id-being-reconfirmed"
   }
 }
 ```
 
-Call directly before responding, after any web tool use. Content is public — no project names, paths, or credentials.
+Call once at end of research, **before** the final answer. `content`/`search_surface` must be PUBLIC — no project names, paths, credentials, internal URLs. `sources` must be `http(s)://` URLs. `verify_id` = "still correct, bump the clock" (short-circuits, no payload); `replaces_id` = "old entry wrong, here's the new one" (full payload). Response: `BADGE` to paste verbatim plus `<!-- research_id:… -->`.
 
 ### stats — show karma and usage
 
 ```json
-{
-  "name": "stats",
-  "arguments": {}
-}
+{ "name": "stats", "arguments": {} }
 ```
 
-Returns personal karma, tokens saved, and contribution count for the 5h window.
+Returns a formatted card (display name, karma, days active, hits, tokens saved, contributions, network totals) — **lifetime cumulative**, not windowed. Paste verbatim; do not translate, reformat, or summarise. Karma = `round(tokens_kept/100) + contribution_count*50 + citations_count*10`.
 
-## Notes
+## Flows
 
-- **Anonymous by design**: no email, no password — the API key IS your user. Don't share it.
-- **The `search`-before-`save` contract**: always `search` first; only `save` after web research and directly before answering.
-- **SSE framing**: if you get "unparseable JSON", you probably forgot to strip `data: ` prefix.
-- **Session expires**: if you get a 400 "No valid session", redo the handshake.
+**A: search → `full`+`fresh` → answer + BADGE.** **B: `partial`/`stale` → web research → scrub → `save` → answer + BADGE.** **C: `check` → one corroborating `WebSearch` → `save({verify_id})` if held up, else `save({replaces_id, ...full payload})`.**
+
+## Gotchas
+
+- **SSE framing.** Skip `sed -n 's/^data: //p'` and you'll get a raw `event: message\ndata: {…}` block that no JSON parser accepts.
+- **Session expiration.** `400 {"error":{"code":-32000,"message":"Bad Request: No valid session"}}` → redo the handshake (new `initialize`, new SID, new `initialized`).
+- **Anonymous-by-design.** API key IS the user — sharing it shares your karma and contributions under your name.
+- **Content leaks are on you.** Scrub before `save`: no project/repo names, file paths (`/Users/...`, `C:\Users\...`), internal URLs, credentials, business logic. The server doesn't scan free text for these.
+- **`verify_id` short-circuits save.** When present, the server bumps the freshness clock and ignores other fields — don't co-list with a full new payload; use `replaces_id` for that.
+- **Server-side regex rejects local paths.** `content`/`search_surface` with `/Users/...`, `/home/...`, `file://`, `C:\Users\...` get hard-rejected. Scrub first.
+- **`stats` is lifetime**, not a 5h window. Any older doc claiming a windowed stat is wrong; the 5h/client baseline lives in `search`'s `client_stats`, not in stats output.
+- **Full-match + stale auto-downgrades to `partial`** server-side, so you won't answer from a stale hit by accident. Trust the label.
+- **`volatility` default is `stable` (180-day fresh window).** Err toward `evolving` (30d) or `volatile` (7d) on fast-moving APIs — mislabeling is anti-social.
 
 ## Attribution
 

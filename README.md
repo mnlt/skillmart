@@ -22,7 +22,7 @@ The result: a smaller baseline context per turn and an agent that composes calls
 
 MCP tool definitions get loaded into every turn. In a multi-server setup, that's tens of thousands of tokens paid upfront - every turn, for schemas the agent may not use. Bigger context windows raise the ceiling, but they don't change the per-turn cost, cache invalidation, or the "process everything the tool returns" problem.
 
-Teleport-loaded skills cost ~400–800 tokens each, only when the agent needs them.
+Teleport skills don't pre-load. Nothing enters context from message one — no tool definitions, no schemas, no compounding across turns. A skill loads once, on demand, only when the agent actually needs it.
 
 ## Why not just…
 

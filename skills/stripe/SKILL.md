@@ -1,12 +1,17 @@
 ---
 name: stripe
-description: Query and manage payments, customers, subscriptions, invoices in Stripe via its REST API. Use when the user wants to interact with Stripe programmatically without the MCP server installed.
+description: Operate Stripe's REST API — customers, payments (PaymentIntents / Charges), refunds, subscriptions, invoices, Checkout Sessions, products/prices, payouts, disputes. Use when the user wants to query or mutate Stripe data programmatically without the MCP server or the Dashboard.
 license: MIT (skill wrapper; Stripe API terms apply)
 ---
 
 # Stripe
 
-Operates Stripe via its public REST API. No MCP server required — bypasses directly via HTTP.
+Direct REST access to Stripe's billing surface. Prefer this over training memory for real lookups/mutations, and over the Dashboard for scripted ops.
+
+## Usage
+
+- **Use for:** Querying customers/charges, running refunds, creating PaymentIntents or Checkout Sessions, listing subscriptions/invoices.
+- **Skip for:** Pricing strategy advice, SCA/3DS concept explanations, debugging stripe-node SDK errors (use Context7), tax rate questions.
 
 ## Credentials check
 
@@ -19,60 +24,95 @@ Operates Stripe via its public REST API. No MCP server required — bypasses dir
 If MISSING, **respond to the user with EXACTLY this message (do NOT paraphrase, do NOT suggest manual JSON edits):**
 
 > I need your stripe credential. Run this in another terminal — it'll open the signup page, validate format, and save it safely with masked input:
-> 
+>
 > ```
 > teleport-setup add-key stripe
 > ```
-> 
+>
 > Then restart Claude Code (`/exit`, then `claude`) and ask me again.
 
 **Do NOT suggest editing `~/.claude/settings.local.json` manually.** The `teleport-setup add-key` command handles it with backup, validation, and masked input. Stop execution until the user has run the command and restarted.
 
-**CRITICAL: use `sk_test_*` keys for development. `sk_live_*` charges real money.** Always confirm with the user which mode they intend before destructive operations (create charges, refunds, etc.).
+**Test vs. live:** `sk_test_...` is sandbox; `sk_live_...` moves real money. Before destructive ops, check `echo "${STRIPE_API_KEY:0:8}"` and confirm intent.
 
 ## API
 
-- Base URL: `https://api.stripe.com/v1`
-- Auth header: `Authorization: Bearer $STRIPE_API_KEY`
-- Content header: `Content-Type: application/x-www-form-urlencoded` (Stripe uses form encoding, NOT JSON)
+- Base URL: `https://api.stripe.com/v1` · Auth: `Authorization: Bearer $STRIPE_API_KEY`.
+- **Body encoding: `application/x-www-form-urlencoded` — NOT JSON.** `curl -d "key=value"` sets this; a JSON body returns 400.
+- **Pin `Stripe-Version`** on every request (e.g. `2026-03-25.dahlia`) — unset floats to the account default and can drift.
+- Nested params use brackets: `metadata[order_id]=123`, `payment_method_types[]=card`, `line_items[0][price]=price_X`.
+- **Idempotency:** `Idempotency-Key: <uuid>` on POSTs that shouldn't double-execute. TTL ≥24h, per-account, test/live independent. Same key + different body → `idempotency_error` (not a silent swap).
+- Pagination is cursor-based: `starting_after={last_id}` / `ending_before=` (object IDs, not offsets); `limit` max 100. Rate limits ~100 req/s live, ~25 req/s test (Search 20/s).
 
-## Common patterns
+Common header alias used below:
 
 ```bash
-# List recent customers
-curl -sL -H "Authorization: Bearer $STRIPE_API_KEY" \
-  "https://api.stripe.com/v1/customers?limit=20"
-
-# Retrieve a specific customer
-curl -sL -H "Authorization: Bearer $STRIPE_API_KEY" \
-  "https://api.stripe.com/v1/customers/cus_XXX"
-
-# Create a customer
-curl -sL -X POST -H "Authorization: Bearer $STRIPE_API_KEY" \
-  "https://api.stripe.com/v1/customers" \
-  -d "email=user@example.com&description=Test"
-
-# List active subscriptions
-curl -sL -H "Authorization: Bearer $STRIPE_API_KEY" \
-  "https://api.stripe.com/v1/subscriptions?status=active&limit=10"
-
-# Search customers (full-text)
-curl -sL -H "Authorization: Bearer $STRIPE_API_KEY" -G \
-  "https://api.stripe.com/v1/customers/search" \
-  --data-urlencode "query=email:'user@example.com'"
-
-# Recent charges/payments
-curl -sL -H "Authorization: Bearer $STRIPE_API_KEY" \
-  "https://api.stripe.com/v1/payment_intents?limit=10"
+SH=(-H "Authorization: Bearer $STRIPE_API_KEY" -H "Stripe-Version: 2026-03-25.dahlia")
 ```
 
-## Notes
+## Endpoints
 
-- Stripe uses `application/x-www-form-urlencoded` bodies, NOT JSON — use `-d "key=value&key2=value2"` in curl, not `-d '{"key":"value"}'`.
-- Nested fields use bracket syntax: `-d "metadata[key]=value"`.
-- Expand nested objects: add `expand[]=customer&expand[]=subscription` query params.
-- Rate limits: 100 read req/sec, 100 write req/sec in live mode; higher in test.
-- ALWAYS read before write when possible, and confirm destructive operations (refunds, cancels, deletions) with the user explicitly.
+| Resource          | Path                                                 |
+| ----------------- | ---------------------------------------------------- |
+| Customers         | `/v1/customers`                                      |
+| PaymentIntents    | `/v1/payment_intents` (modern, SCA/3DS-aware)        |
+| Charges           | `/v1/charges` (legacy; read-only for new code)       |
+| Refunds           | `/v1/refunds`                                        |
+| Subscriptions     | `/v1/subscriptions`                                  |
+| Invoices / Items  | `/v1/invoices`, `/v1/invoiceitems`                   |
+| Products / Prices | `/v1/products`, `/v1/prices`                         |
+| Checkout Sessions | `/v1/checkout/sessions`                              |
+| Payouts / Balance | `/v1/payouts`, `/v1/balance`                         |
+| Disputes          | `/v1/disputes`                                       |
+
+## Primary workflow
+
+**Query a customer + recent charges** (trim with `jq`):
+
+```bash
+curl -sL "${SH[@]}" "https://api.stripe.com/v1/customers/cus_XXX"
+curl -sL -G "${SH[@]}" "https://api.stripe.com/v1/charges" \
+  --data-urlencode "customer=cus_XXX" --data-urlencode "limit=10" \
+  | jq '[.data[] | {id, amount, currency, status, created}]'
+```
+
+## Secondary workflows
+
+**Create a PaymentIntent** (`amount=2000` = $20.00 USD; JPY/KRW are zero-decimal — see Gotchas):
+
+```bash
+curl -sL -X POST "${SH[@]}" -H "Idempotency-Key: $(uuidgen)" \
+  "https://api.stripe.com/v1/payment_intents" \
+  -d "amount=2000" -d "currency=usd" \
+  -d "customer=cus_XXX" -d "payment_method_types[]=card"
+```
+
+**Refund** (pass `payment_intent` or legacy `charge`; add `-d "amount=500"` for partial):
+
+```bash
+curl -sL -X POST "${SH[@]}" -H "Idempotency-Key: $(uuidgen)" \
+  "https://api.stripe.com/v1/refunds" -d "payment_intent=pi_XXX"
+```
+
+**Expand to avoid N+1** (on list endpoints prefix with `data.`; max depth 4):
+
+```bash
+curl -sL -G "${SH[@]}" "https://api.stripe.com/v1/charges" \
+  --data-urlencode "limit=5" \
+  --data-urlencode "expand[]=data.customer" \
+  --data-urlencode "expand[]=data.payment_intent"
+```
+
+## Gotchas
+
+- **Amounts are in the currency's smallest unit.** USD/EUR/GBP: `amount=1000` = $10.00. JPY/KRW and other **zero-decimal** currencies: `amount=1000` = ¥1000. Wrong assumption = 100x mis-charge.
+- **Form-urlencoded, NOT JSON.** `-d '{"amount":1000}'` returns 400. Use `-d "amount=1000"`.
+- **Nested params use bracket syntax.** `parent[child]=value`. Arrays: `key[]=a&key[]=b`. Arrays of objects: `key[0][sub]=a`.
+- **`expand[]=` prevents N+1.** Without it nested objects come back as IDs only; on list endpoints prefix with `data.`.
+- **Pagination is cursor-based.** `starting_after={last_id}` — cursor is an object ID, not a number. `limit` max 100.
+- **`Stripe-Version` floats silently** if unset. Pin it explicitly on every request.
+- **Idempotency-Key semantics.** TTL ≥24h, per-account, test/live independent. Replaying same key + same body returns the original response silently; different body + same key → `idempotency_error`.
+- **PaymentIntents vs Charges.** New code: `/v1/payment_intents` (SCA/3DS handled). Treat `/v1/charges` as read-only for modern work.
 
 ## Attribution
 

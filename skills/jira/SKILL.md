@@ -1,12 +1,17 @@
 ---
 name: jira
-description: Create, query, and update issues, boards, sprints in Jira Cloud via its REST API. Use when the user wants to interact with Jira programmatically without the MCP server installed.
+description: Operate Jira Cloud via its REST v3 API — issues, projects, sprints, boards, comments, transitions, JQL search. Use when the user wants to triage, bulk-update, report on, or otherwise interact with Jira programmatically without the MCP server installed.
 license: MIT (skill wrapper; Atlassian API terms apply)
 ---
 
 # Jira (Atlassian Cloud)
 
-Operates Jira Cloud via its public REST API. No MCP server required — bypasses directly via HTTP.
+Direct REST access to Jira Cloud — no MCP server required. Good for triaging backlogs, bulk status updates, sprint/board reporting, creating issues from logs.
+
+## Usage
+
+- **Use for:** JQL searches, bulk transitions, creating/commenting on issues, sprint/board reporting.
+- **Skip for:** Personal TODOs, teams on Linear/GitHub Issues, read-only link sharing, Server/Data Center Jira (Cloud only).
 
 ## Credentials check
 
@@ -33,43 +38,84 @@ If any required env var is MISSING, **respond to the user with EXACTLY this mess
 
 ## API
 
-- Base URL: `{JIRA_BASE_URL}/rest/api/3` (Jira Cloud v3 REST; use v2 for older behaviors)
-- Auth header: `Authorization: Basic $(echo -n "$JIRA_EMAIL:$JIRA_API_TOKEN" | base64)`
-  - **Jira Cloud uses Basic auth** with email + API token base64-encoded together.
-- Content header: `Content-Type: application/json`
+- Base URL: `$JIRA_BASE_URL/rest/api/3` — per-workspace (e.g. `https://acme.atlassian.net/rest/api/3`).
+- **Auth is Basic, NOT Bearer.** `AUTH="Basic $(printf '%s' "$JIRA_EMAIL:$JIRA_API_TOKEN" | base64)"`. `Bearer $TOKEN` → 401.
+- Headers: `Accept: application/json` always; `Content-Type: application/json` on writes.
+- **v3 requires ADF** for rich-text fields (description, comment, environment); v2 accepts plain strings — escape hatch.
+- Rate limits: **cost-based**, not req/min (tier-1 pool 65,000 pts/hr). Watch `X-RateLimit-NearLimit`; on 429 honor `Retry-After`.
 
-## Common patterns
+## Endpoints
+
+| Resource       | Method · Path                                                                      |
+| -------------- | ---------------------------------------------------------------------------------- |
+| Issues         | `GET/POST/PUT/DELETE /rest/api/3/issue[/{idOrKey}]`                                |
+| JQL search     | `POST /rest/api/3/search/jql` (old `/search` deprecated)                           |
+| Transitions    | `GET/POST /rest/api/3/issue/{idOrKey}/transitions`                                 |
+| Comments       | `GET/POST /rest/api/3/issue/{idOrKey}/comment[/{id}]` (ADF body)                   |
+| Projects       | `GET /rest/api/3/project[/{idOrKey}]` <!-- unverified -->                          |
+| Boards/Sprints | `GET /rest/agile/1.0/board[/{id}/sprint]` <!-- unverified: Agile API -->           |
+| Users          | `GET /rest/api/3/myself`, `/rest/api/3/user?accountId=...` <!-- unverified -->     |
+| Fields         | `GET /rest/api/3/field` (resolve `customfield_*` → friendly name)                  |
+| Attachments    | `POST /rest/api/3/issue/{idOrKey}/attachments` (multipart + XSRF header)           |
+
+## Primary workflow — JQL search
+
+POST (not GET — long JQL exceeds URL limits). JQL is not SQL: no JOIN/SELECT; multi-word values need double quotes.
 
 ```bash
-# Helper — compute basic auth token
-AUTH="Basic $(printf '%s' "$JIRA_EMAIL:$JIRA_API_TOKEN" | base64)"
-
-# Get current user (test auth)
-curl -sL -H "Authorization: $AUTH" "$JIRA_BASE_URL/rest/api/3/myself"
-
-# Search issues with JQL
-curl -sL -H "Authorization: $AUTH" \
-  "$JIRA_BASE_URL/rest/api/3/search?jql=project=PROJ%20AND%20status=%22In%20Progress%22&maxResults=20"
-
-# Get a specific issue
-curl -sL -H "Authorization: $AUTH" "$JIRA_BASE_URL/rest/api/3/issue/PROJ-123"
-
-# Create an issue
 curl -sL -X POST -H "Authorization: $AUTH" -H "Content-Type: application/json" \
-  "$JIRA_BASE_URL/rest/api/3/issue" \
-  -d '{"fields":{"project":{"key":"PROJ"},"summary":"...","issuetype":{"name":"Task"},"description":{"type":"doc","version":1,"content":[{"type":"paragraph","content":[{"type":"text","text":"..."}]}]}}}'
-
-# Add a comment
-curl -sL -X POST -H "Authorization: $AUTH" -H "Content-Type: application/json" \
-  "$JIRA_BASE_URL/rest/api/3/issue/PROJ-123/comment" \
-  -d '{"body":{"type":"doc","version":1,"content":[{"type":"paragraph","content":[{"type":"text","text":"..."}]}]}}'
+  "$JIRA_BASE_URL/rest/api/3/search/jql" \
+  -d '{
+    "jql": "project = ENG AND status = \"In Progress\" AND assignee = currentUser() ORDER BY updated DESC",
+    "fields": ["summary", "status", "assignee", "updated"],
+    "maxResults": 50
+  }'
 ```
 
-## Notes
+Pagination on `/search/jql` is token-based (`nextPageToken` + `isLast`) — old `/search` used `startAt`/`maxResults`.
 
-- Jira REST v3 uses **Atlassian Document Format (ADF)** for description/comment bodies — JSON structure with `doc`/`paragraph`/`text` nodes, not plain strings. Use v2 endpoint (`/rest/api/2/`) if you need plain-text bodies.
-- JQL (Jira Query Language) goes in the `jql` URL param, URL-encoded.
-- Rate limits: Atlassian throttles aggressively on large result sets. Use `maxResults` and pagination (`startAt`).
+## Secondary workflows
+
+**Read / create an issue** (create uses ADF for `description`):
+
+```bash
+curl -sL -H "Authorization: $AUTH" "$JIRA_BASE_URL/rest/api/3/issue/ENG-123?fields=summary,status,assignee"
+
+curl -sL -X POST -H "Authorization: $AUTH" -H "Content-Type: application/json" \
+  "$JIRA_BASE_URL/rest/api/3/issue" \
+  -d '{"fields":{"project":{"key":"ENG"},"issuetype":{"name":"Task"},"summary":"Flaky test",
+       "description":{"type":"doc","version":1,"content":[{"type":"paragraph","content":[{"type":"text","text":"Fails on CI."}]}]}}}'
+```
+
+**Transition** (per-project workflow — list first, then execute):
+
+```bash
+curl -sL -H "Authorization: $AUTH" "$JIRA_BASE_URL/rest/api/3/issue/ENG-123/transitions" \
+  | jq '.transitions[] | {id, name, to: .to.name}'
+curl -sL -X POST -H "Authorization: $AUTH" -H "Content-Type: application/json" \
+  "$JIRA_BASE_URL/rest/api/3/issue/ENG-123/transitions" -d '{"transition":{"id":"31"}}'
+```
+
+## ADF (the v3 quirk)
+
+Rich-text fields on v3 reject plain strings. Send a `doc` node (`version: 1`, `content: []`):
+
+```json
+{"type":"doc","version":1,"content":[{"type":"paragraph","content":[{"type":"text","text":"Hello world"}]}]}
+```
+
+Schema at `http://go.atlassian.com/adf-json-schema`. **Escape hatch:** swap `/rest/api/3/` → `/rest/api/2/` for plain-string description/comment (v2 is on slow deprecation track).
+
+## Gotchas
+
+- **Auth is Basic, not Bearer.** `Bearer $TOKEN` → 401. Must be `Basic <base64(email:token)>`.
+- **ADF required on v3 rich-text fields.** `"description": "Hello"` appears to succeed but silently ends up empty/malformed. Wrap in a `doc` node, or fall back to `/rest/api/2/`.
+- **JQL is not SQL.** No JOIN, no SELECT; fields named directly. Multi-word values need `"..."`; in JSON body escape as `\"`.
+- **Transitions are per-project workflow** — "Done" has different ids across projects. Always `GET .../transitions` first, never hard-code.
+- **`issueIdOrKey` accepts both** numeric (`10042`) and key (`ENG-123`). Prefer the key — it's readable.
+- **Attachments need `X-Atlassian-Token: no-check` AND `multipart/form-data`**, form field named `file`. Missing XSRF header → blocked.
+- **Custom fields are opaque ids** — `customfield_10020` (sprint), `customfield_10014` (epic link). Map via `GET /rest/api/3/field`, cache.
+- **Search moved.** `/rest/api/3/search` is "Currently being removed"; use `/search/jql`. Old = `startAt`/`maxResults`; new = `nextPageToken`/`isLast`.
 
 ## Attribution
 
