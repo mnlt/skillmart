@@ -6,7 +6,20 @@ license: MIT (skill wrapper; Context7 API terms apply)
 
 # Context7
 
-Operates Context7 via its public REST API. No MCP server required — bypasses directly via HTTP.
+Live documentation lookup for libraries, frameworks, and SDKs. Operates Context7 via its public REST API — no MCP server required.
+
+**Use this instead of training memory whenever the answer depends on the library's *current* behavior** (current major version, recent API changes, new methods, deprecations). Training data goes stale fast for active libraries.
+
+## When to use vs. skip
+
+| Use Context7                                              | Skip Context7                                                |
+| --------------------------------------------------------- | ------------------------------------------------------------ |
+| "How do I do X in Next.js 15 / React 19 / Prisma 6?"      | "What's a closure in JavaScript?" (language concept)         |
+| "What's the right way to set up Auth.js v5 middleware?"   | "Fix this TypeError in my code" (debugging user's own code)  |
+| "Did the Supabase client API change for storage uploads?" | "Convert this loop to a map" (pure refactor, no SDK)         |
+| Anything where you'd otherwise hedge with "as of my training cutoff…" | Std-lib (`fs`, `os`, `collections`) unless asking about a recent runtime version |
+
+If you catch yourself about to write code from memory for a library that's released in the last 18 months, stop and call this skill first.
 
 ## Credentials check
 
@@ -14,7 +27,7 @@ Operates Context7 via its public REST API. No MCP server required — bypasses d
 [ -n "$CONTEXT7_API_KEY" ] && echo "CONTEXT7_API_KEY: PRESENT" || echo "CONTEXT7_API_KEY: MISSING"
 ```
 
-**Never** echo the variable directly.
+**Never** echo the variable directly — the value would land in the conversation transcript.
 
 If MISSING, **respond to the user with EXACTLY this message (do NOT paraphrase, do NOT suggest manual JSON edits):**
 
@@ -32,10 +45,11 @@ If MISSING, **respond to the user with EXACTLY this message (do NOT paraphrase, 
 
 - Base URL: `https://context7.com/api/v1`
 - Auth header: `Authorization: Bearer $CONTEXT7_API_KEY`
+- All requests are GET. Responses are markdown by default (`type=txt`) or JSON (`type=json`).
 
 ## Two-step workflow
 
-Context7 docs lookup is two calls: (1) resolve the library name to its canonical library ID, (2) fetch docs by ID.
+Docs lookup is two calls: (1) **resolve** the library name to its canonical `libraryId`, (2) **fetch** docs for that ID, scoped by topic.
 
 ### Step 1 — Resolve library name → library ID
 
@@ -44,24 +58,43 @@ curl -sL -H "Authorization: Bearer $CONTEXT7_API_KEY" \
   "https://context7.com/api/v1/search?query=next.js"
 ```
 
-Returns an array of matches. Each has a `libraryId` field like `/vercel/next.js` or `/nextauthjs/next-auth`. Pick the best match — usually the one whose name most closely matches the query. If uncertain, show the user the top 2-3 and ask.
+Returns an array of matches. For each candidate, weigh:
+
+- **Name match** — does it actually correspond to what the user asked? "next.js auth" returns *both* `/vercel/next.js` and `/nextauthjs/next-auth`. Different libraries.
+- **Trust / popularity signal** — when present in the result (`trustScore`, `totalSnippets`, stars), prefer high values. Low-trust forks usually mean unofficial mirrors.
+- **`lastUpdate` recency** — abandoned mirrors with stale docs are worse than the canonical repo.
+- **Maintainer org** — `/vercel/next.js` (official) beats `/some-fork/next.js-clone`.
+
+**When uncertain between 2–3 close matches, do NOT guess.** Show the top candidates to the user with a one-line description each and ask which one they want. A wrong libraryId silently returns wrong docs — that's worse than no docs.
 
 ### Step 2 — Fetch docs for the library
 
 ```bash
 curl -sL -H "Authorization: Bearer $CONTEXT7_API_KEY" \
-  "https://context7.com/api/v1/{libraryId}?topic=authentication&tokens=5000"
+  "https://context7.com/api/v1/vercel/next.js?topic=app-router&tokens=5000"
 ```
 
-Path params:
-- `{libraryId}` — from step 1. **Do NOT URL-encode the leading slash** — pass `/vercel/next.js` as-is in the path.
+**Path:**
+- `{libraryId}` is appended verbatim. Pass `/vercel/next.js` as-is — **do NOT URL-encode the leading slash** (would become `%2Fvercel%2Fnext.js` and 404).
 
-Query params:
-- `topic` — optional keyword to scope the docs (e.g. `authentication`, `routing`, `server-actions`).
-- `tokens` — cap on the response size (default 10000, min 1000). Use `3000`–`5000` for targeted answers, higher for comprehensive dives.
-- `type` — optional, `txt` (default) or `json`.
+**Query params:**
 
-Response is markdown-formatted docs. Read, extract the relevant section, answer the user's question. Cite the returned content — don't paraphrase from memory.
+| Param    | Default | Use                                                                                          |
+| -------- | ------- | -------------------------------------------------------------------------------------------- |
+| `topic`  | none    | Single keyword that filters the docs to a slice. Almost always set this — see sizing below.  |
+| `tokens` | 10000   | Cap on response size. Min 1000.                                                              |
+| `type`   | `txt`   | `txt` returns markdown (default, best for reading). `json` returns structured snippet array. |
+
+### Topic + token sizing — pick deliberately
+
+| Question shape                                       | `topic`                  | `tokens` |
+| ---------------------------------------------------- | ------------------------ | -------- |
+| Quick API check: "is `useFormState` still a thing?"  | `forms` or `hooks`       | 2000–3000 |
+| How-to: "how do I set up middleware auth?"           | `middleware-auth`        | 4000–5000 |
+| Migration / deep dive: "what changed v4 → v5?"       | `migration` or `v5`      | 8000–10000 |
+| Browsing: "what does this library even do?"          | omit                     | 5000      |
+
+A full docs dump without `topic` is almost never what you want — it wastes tokens and dilutes signal.
 
 ## Common patterns
 
@@ -74,18 +107,29 @@ LIB_ID=$(curl -sL -H "Authorization: Bearer $CONTEXT7_API_KEY" \
 curl -sL -H "Authorization: Bearer $CONTEXT7_API_KEY" \
   "https://context7.com/api/v1${LIB_ID}?topic=nextjs-setup&tokens=5000"
 
-# Explicitly named library (skip search if user gave the exact ID)
+# Skip search if you're 100% sure of the canonical ID (well-known orgs)
 curl -sL -H "Authorization: Bearer $CONTEXT7_API_KEY" \
   "https://context7.com/api/v1/vercel/next.js?topic=app-router&tokens=5000"
+
+# Multi-library question: resolve + fetch each, then synthesize.
+# Run them in parallel via & for speed.
+curl -sL -H "Authorization: Bearer $CONTEXT7_API_KEY" \
+  "https://context7.com/api/v1/vercel/next.js?topic=middleware&tokens=4000" > /tmp/next.md &
+curl -sL -H "Authorization: Bearer $CONTEXT7_API_KEY" \
+  "https://context7.com/api/v1/nextauthjs/next-auth?topic=v5-middleware&tokens=4000" > /tmp/auth.md &
+wait
 ```
 
-## Notes
+## Gotchas
 
-- **Always resolve first unless you're 100% sure of the library ID.** Guessing the ID leads to 404s or wrong library matches.
-- **Scope the topic** to the user's actual question — a full docs dump wastes tokens.
-- Rate limits: free tier has generous limits for docs fetches. Search endpoint is lighter.
-- Context7 updates docs frequently — prefer Context7 over training-time memory for anything where freshness matters (current framework versions, recently changed APIs).
-- When the user's question clearly spans multiple libraries (e.g. "Next.js 15 + Auth.js v5"), run search + fetch for each relevant library, then synthesize.
+- **Wrong library wins silently.** A bad pick at step 1 returns docs that *look* authoritative for the wrong project. Always sanity-check that the response opens with the library you expected.
+- **Don't paraphrase from training memory.** The whole reason to call Context7 is freshness — quote / adapt from the returned docs, and if the response contradicts what you "remember", trust the response.
+- **404 on a fetch usually means a typo in `libraryId` or URL-encoded slash.** Re-check the path is `/{org}/{repo}` literal.
+- **Library not in catalog** — search returns no matches → fall back to web search and tell the user Context7 didn't have it. Don't fabricate a libraryId.
+- **`tokens` < 1000 is rejected.** Use 2000 as the practical floor.
+- **`topic` is a free-text filter, not an enum.** Phrase it like a section title in the docs (`server-actions`, `migration-v5`, `middleware-auth`). Multi-word topics use hyphens.
+- **Response is markdown with code fences.** When piping into another tool, prefer `type=json` to avoid re-parsing the markdown structure.
+- **Rate limits** — free tier is generous for `/v1/{libraryId}` fetches and lighter for `/search`. Batch your search calls; don't loop.
 
 ## Attribution
 
