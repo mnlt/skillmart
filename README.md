@@ -4,7 +4,7 @@
 [![Skills in catalog](https://img.shields.io/badge/catalog-45%20entries-green.svg)](catalog.json) 
 [![GitHub stars](https://img.shields.io/github/stars/mnlt/teleport?style=social)](https://github.com/mnlt/teleport/stargazers) 
 
-**MCP, but without the MCP.**
+## MCP, but without the MCP
 
 Teleport replaces your MCPs with curated ephemeral skills that call the REST APIs directly (GitHub, Stripe, Notion…) with credentials in env vars, each loaded on demand — so you avoid having every MCP's schemas injected into context from the first message whether you use them or not.
 
